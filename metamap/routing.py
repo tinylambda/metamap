@@ -1,1 +1,0 @@
-from .asgi import application

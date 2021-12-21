@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'core',
+    'access',
 ]
 
 MIDDLEWARE = [
@@ -79,6 +80,15 @@ TEMPLATES = [
 WSGI_APPLICATION = f'{MAIN_MODULE_NAME}.wsgi.application'
 
 ASGI_APPLICATION = f'{MAIN_MODULE_NAME}.asgi.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -319,7 +329,7 @@ CIRCUS_WATCHERS = [
         'name': f'daphne',
         'settings': {
             'cmd': f'python manage.py daphne start --fd $(circus.sockets.{MAIN_MODULE_NAME}_ASGI) '
-            f'--app {MAIN_MODULE_NAME}.routing:application',
+            f'--app {MAIN_MODULE_NAME}.asgi:application',
             'use_sockets': 'True',
             'singleton': 'False',
             'autostart': 'True',
