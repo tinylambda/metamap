@@ -32,8 +32,6 @@ class WebsocketClient:
 
     def __attrs_post_init__(self):
         self.server_close_message = 'server close the connection'
-
-    def do_init(self):
         self.input_q = asyncio.Queue()
         self.event_loop = asyncio.get_event_loop()
         signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
@@ -129,7 +127,6 @@ class WebsocketClient:
                 await self.handle_ws_recv()
 
     def run(self):
-        self.do_init()
         self.event_loop.add_reader(sys.stdin, self.get_stdin, self.input_q)
         self.event_loop.create_task(self._run())
         self.event_loop.run_forever()
