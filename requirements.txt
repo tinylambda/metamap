@@ -9,3 +9,5 @@ channels==3.0.4
 channels-redis==3.3.1
 websockets==10.1
 attrs==21.2.0
+aetcd3==0.1.0a7
+mysqlclient==2.1.0

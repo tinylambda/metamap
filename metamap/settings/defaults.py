@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'account',
     'core',
     'access',
 ]
@@ -146,6 +147,10 @@ STATIC_ROOT = f'/tmp/{MAIN_MODULE_NAME}/static_root/'  # Change this as needed
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Use custom user model
+# https://docs.djangoproject.com/en/4.0/topics/auth/customizing/#substituting-a-custom-user-model
+AUTH_USER_MODEL = 'account.User'
 
 # Logging
 # https://docs.djangoproject.com/en/4.0/topics/logging/#logging
@@ -369,6 +374,12 @@ for CIRCUS_WATCHER in CIRCUS_WATCHERS:
         setting_value = settings[setting_key]
         setting_value = setting_value.format(**render_context)
         CIRCUSD_CONFIG.set(section_name, setting_key, setting_value)
+
+
+ETCD_KWARGS = {
+    'host': 'localhost',
+    'port': 2379,
+}
 
 
 @atexit.register

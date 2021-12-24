@@ -127,3 +127,5 @@ static/tests/
 *.ini
 
 *.touch
+
+metamap/settings/local*

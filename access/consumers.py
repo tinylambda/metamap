@@ -12,6 +12,8 @@ class AccessConsumer(AsyncWebsocketConsumer):
         super().__init__(*args, **kwargs)
 
     async def connect(self):
+        user = self.scope['user']
+        self.LOGGER.info('user is %s', user)
         self.group_name = self.scope['url_route']['kwargs']['group_name']
         self.group_name = f'group_{self.group_name}'
         await self.channel_layer.group_add(self.group_name, self.channel_name)
