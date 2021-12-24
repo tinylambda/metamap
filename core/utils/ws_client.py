@@ -133,13 +133,17 @@ class WebsocketClient:
 
     @classmethod
     def start(cls, uri=None, on_open=None, on_message=None, on_error=None, on_close=None, **kwargs):
-        client = cls(uri=uri, on_open=on_open, on_message=on_message, on_error=on_error, on_close=on_close)
+        client = cls(uri=uri, on_open=on_open, on_message=on_message, on_error=on_error, on_close=on_close, **kwargs)
         client.run()
         return client.shutdown_normal()
 
     @classmethod
     def start_with_retry(cls, *args, **kwargs):
-        max_retry_times = kwargs.get('max_retry_times', 3)
+        try:
+            max_retry_times = kwargs.pop('max_retry_times')
+        except KeyError:
+            max_retry_times = 10
+
         while True:
             cls.CONN_TRIED_TIMES += 1
             shutdown_normal = cls.start(*args, **kwargs)
@@ -151,8 +155,9 @@ class WebsocketClient:
 
 
 if __name__ == '__main__':
-    WebsocketClient.start_with_retry(uri='ws://localhost:8000/ws/access/cc/',
+    WebsocketClient.start_with_retry(uri='ws://localhost:8000/ws/access/cc/?x=100',
                                      on_open=lambda: print('connected'),
                                      on_message=lambda msg: print(f'--{msg}--'),
                                      on_error=lambda e: print(e),
-                                     on_close=lambda e: print('on_close: bye'))
+                                     on_close=lambda e: print('on_close: bye'),
+                                     max_retry_times=10000)
