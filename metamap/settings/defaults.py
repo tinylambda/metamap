@@ -291,7 +291,7 @@ CIRCUS_WATCHER_DEFAULT_SETTINGS = {
     'stop_children': 'False',
     'max_retry': '2',
     'graceful_timeout': '30',
-    'priority': '0',
+    'priority': '10',
     'singleton': 'True',
     'use_sockets': 'False',
     # 'max_age': '100000',  # Default disabled
@@ -340,7 +340,8 @@ CIRCUS_WATCHERS = [
             'use_sockets': 'True',
             'singleton': 'False',
             'autostart': 'True',
-            'numprocesses': f'{OS_CPU_COUNT - 1}',
+            'numprocesses': f'{max(OS_CPU_COUNT - 1, 1)}',
+            'priority': '1',
         }
     },
 ]
