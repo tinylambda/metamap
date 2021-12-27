@@ -8,7 +8,7 @@ Prepare MySQL
  docker run -e MYSQL_ROOT_PASSWORD=mysqlpass -p 3306:3306 -d mysql:5.7
  mysql -uroot -pmysqlpass -h127.0.0.1
  mysql> create database metamap;
- mysql> create user 'game'@'%' identified by mysqlpass
+ mysql> create user 'game'@'%' identified by 'mysqlpass'
  mysql> grant all privileges on metamap.* to 'game'@'%';
 
 Prepare Redis and Etcd
@@ -60,3 +60,6 @@ Start a simple WebSocket client
 
  DJANGO_RUNTIME_ENV=local python core/utils/ws_client.py
 
+Use Let's Encrypt in production environment
+====
+- https://certbot.eff.org/instructions

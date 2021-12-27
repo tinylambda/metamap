@@ -19,7 +19,7 @@ from pathlib import Path
 from core.utils.config import ConfigWriterWithRepeatKeys
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-BASE_DIR = BASE_DIR / '..'
+BASE_DIR = (BASE_DIR / '..').resolve()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -65,7 +65,9 @@ ROOT_URLCONF = f'{MAIN_MODULE_NAME}.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            BASE_DIR / 'templates',
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [

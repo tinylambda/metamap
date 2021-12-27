@@ -36,8 +36,8 @@ class WebsocketClient:
         self.event_loop = asyncio.get_event_loop()
         signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
         for s in signals:
-            self.event_loop.add_signal_handler(s, lambda s=s: asyncio.create_task(
-                self.shutdown(loop=self.event_loop, sig=s)))
+            self.event_loop.add_signal_handler(s, lambda _s=s: asyncio.create_task(
+                self.shutdown(loop=self.event_loop, sig=_s)))
         self.event_loop.set_exception_handler(self.handle_exception)
 
     @staticmethod
