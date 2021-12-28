@@ -200,8 +200,8 @@ UWSGI_INSTANCE_CONFIG = {
     'socket': '127.0.0.1:0',
     'harakiri': '20',
     'vacuum': 'true',
-    'processes': f'{OS_CPU_COUNT - 1}',
-    # 'threads': '20',
+    'processes': f'{max(OS_CPU_COUNT - 1, 1)}',
+    # 'threads': '2s0',
     'enable-threads': 'false',  # Running uWSGI with the threads options will automatically enable threading support
     'no-threads-wait': 'true',
     'max-requests': '5000',
