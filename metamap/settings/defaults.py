@@ -196,7 +196,7 @@ UWSGI_INSTANCE_CONFIG = {
     'module': WSGI_APPLICATION.replace('.application', ':application'),
     'master': 'true',
     'pidfile': os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.pid'),
-    'http': ['0.0.0.0:8000'],
+    'http': ['127.0.0.1:8000'],
     'socket': '127.0.0.1:0',
     'harakiri': '20',
     'vacuum': 'true',
@@ -210,7 +210,7 @@ UWSGI_INSTANCE_CONFIG = {
     'touch-chain-reload': os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.touch'),
     'disable-logging': 'false',
     'log-master': 'true',  # delegate logging to master process
-    'stats': '0.0.0.0:9191',
+    'stats': '127.0.0.1:9191',
     'stats-http': 'true',
     'static-map': [f'/static={STATIC_ROOT}'],
 }
@@ -305,7 +305,7 @@ CIRCUS_WATCHER_DEFAULT_SETTINGS = {
 CIRCUS_SOCKETS = [{
     'name': f'{MAIN_MODULE_NAME}_ASGI',
     'settings': {
-        'host': '0.0.0.0',
+        'host': '127.0.0.1',
         'port': '20000',
     }
 }]
