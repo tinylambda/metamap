@@ -63,3 +63,28 @@ Start a simple WebSocket client
 Use Let's Encrypt in production environment
 ====
 - https://certbot.eff.org/instructions
+
+Deploy in production environment
+====
+.. code-block:: python
+
+    # update database configuration
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'metamap',
+            'HOST': '127.0.0.1',
+            'PORT': 3306,
+            'USER': 'game',
+            'PASSWORD': 'mysqlpass',
+            'OPTIONS': {},
+        }
+    }
+    # disable DEBUG
+    DEBUG = False
+
+    # add your domains to ALLOWED_HOSTS
+    ALLOWED_HOSTS = ['game-http.domain.com', 'game-ws.domain.com',]
+
+    # allow CSRF on your http server
+    CSRF_TRUSTED_ORIGINS = ['https://game-http.domain.com',]
