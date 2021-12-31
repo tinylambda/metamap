@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'account',
     'core',
     'access',
+    'server',
 ]
 
 MIDDLEWARE = [
@@ -383,6 +384,18 @@ ETCD_KWARGS = {
     'host': 'localhost',
     'port': 2379,
 }
+
+# Where to register all types of services
+SERVICE_ROOT = f'/{MAIN_MODULE_NAME}/services/'
+
+# Distributed locks used in this project
+SERVICE_LOCK_ROOT = f'/{MAIN_MODULE_NAME}/locks/'
+
+# How many seconds a service's lease
+SERVICE_LEASE_DEFAULT_SECONDS = 20
+
+# A live service will refresh its lease when TTL is less than
+SERVICE_LEASE_REFRESH_WHEN_SMALLER_THAN = 5
 
 
 @atexit.register
