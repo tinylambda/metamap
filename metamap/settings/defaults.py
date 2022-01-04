@@ -200,7 +200,7 @@ ASGI_SERVICE_PROCESSES = max(OS_CPU_COUNT - 1, 1)
 # This is the content of Gunicorn conf file, a valid Python file
 # https://docs.gunicorn.org/en/stable/settings.html#settings
 GUNICORN_CONFIG = f'''
-bind = ['0.0.0.0:8777', ]
+bind = ['127.0.0.1:8000', ]
 backlog = 2048
 workers = {WSGI_SERVICE_PROCESSES}
 worker_class = 'sync'
