@@ -188,21 +188,121 @@ LOGGING = {
 }
 
 OS_CPU_COUNT = os.cpu_count()
+
+WSGI_APPLICATION_REPR = WSGI_APPLICATION.replace('.application', ':application')
+
+WSGI_SERVICE_PROCESSES = max(OS_CPU_COUNT - 1, 1)
+
+WSGI_SERVICE_THREADS_PER_PROCESS = 32
+
+ASGI_SERVICE_PROCESSES = max(OS_CPU_COUNT - 1, 1)
+
+# This is the content of Gunicorn conf file, a valid Python file
+# https://docs.gunicorn.org/en/stable/settings.html#settings
+GUNICORN_CONFIG = f'''
+bind = ['0.0.0.0:8777', ]
+backlog = 2048
+workers = {WSGI_SERVICE_PROCESSES}
+worker_class = 'sync'
+threads = {WSGI_SERVICE_THREADS_PER_PROCESS}
+worker_connections = 1000
+max_requests = 0
+max_requests_jitter = 0
+timeout = 30
+graceful_timeout = 30
+keepalive = 60
+wsgi_app = '{WSGI_APPLICATION_REPR}'
+reload = False
+reload_engine = 'auto'
+reload_extra_files = []
+spew = False
+check_config = False
+print_config = False
+accesslog = '-'
+disable_redirect_access_to_syslog = False
+access_log_format = '%(h)s %(l)s %(u)s %(t)s "%(r)s" %(s)s %(b)s "%(f)s" "%(a)s"'
+errorlog = '-'
+loglevel = 'info'
+capture_output = False
+logger_class = 'gunicorn.glogging.Logger'
+logconfig = None
+logconfig_dict = {{}}
+syslog_addr = 'udp://localhost:514'
+syslog = False
+syslog_prefix = None
+syslog_facility = 'user'
+enable_stdio_inheritance = False
+statsd_host = None
+dogstatsd_tags = ''
+statsd_prefix = ''
+proc_name = '{MAIN_MODULE_NAME}'
+default_proc_name = 'gunicorn'
+
+# The maximum size of HTTP request line in bytes.
+limit_request_line = 4094
+
+# Limit the number of HTTP headers fields in a request.
+limit_request_fields = 100
+
+# Limit the allowed size of an HTTP request header field.
+limit_request_field_size = 8190
+
+preload_app = True
+
+sendfile = None
+
+reuse_port = True
+
+chdir = '{str(BASE_DIR)}'
+
+daemon = False
+
+raw_env = []
+
+pidfile = None
+
+worker_tmp_dir = None
+
+# user = 'felix'
+# group = 'felix'
+# umask = 0022
+# initgroups = False
+
+tmp_upload_dir = None
+
+secure_scheme_headers = {{
+    'X-FORWARDED-PROTOCOL': 'ssl', 
+    'X-FORWARDED-PROTO': 'https', 
+    'X-FORWARDED-SSL': 'on',
+}}
+
+forwarded_allow_ips = '*'
+
+pythonpath = None
+paste = None
+proxy_protocol = False
+
+proxy_allow_ips = '*'
+raw_paste_global_conf = []
+strip_header_spaces = False
+'''
+GUNICORN_CONFIG_FILENAME = os.path.join(BASE_DIR, 'run', f'gunicorn_{MAIN_MODULE_NAME}.py')
+
 UWSGI_CONFIG = ConfigWriterWithRepeatKeys()
 UWSGI_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.ini')
 
 UWSGI_INSTANCE_CONFIG = {
     'env': f'DJANGO_SETTINGS_MODULE={MAIN_MODULE_NAME}.settings',
     'chdir': str(BASE_DIR),
-    'module': WSGI_APPLICATION.replace('.application', ':application'),
+    'module': f'{WSGI_APPLICATION_REPR}',
     'master': 'true',
     'pidfile': os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.pid'),
     'http': ['127.0.0.1:8000'],
     'socket': '127.0.0.1:0',
     'harakiri': '20',
     'vacuum': 'true',
-    'processes': f'{max(OS_CPU_COUNT - 1, 1)}',
-    # 'threads': '2s0',
+    'processes': f'{WSGI_SERVICE_PROCESSES}',
+    # 'threads': f'{WSGI_SERVICE_THREADS_PER_PROCESS}',
     'enable-threads': 'false',  # Running uWSGI with the threads options will automatically enable threading support
     'no-threads-wait': 'true',
     'max-requests': '5000',
@@ -324,9 +424,9 @@ CIRCUS_ENVS = [
 
 CIRCUS_WATCHERS = [
     {
-        'name': f'uwsgi',
+        'name': f'gunicorn',
         'settings': {
-            'cmd': 'python manage.py uwsgi start',
+            'cmd': 'python manage.py gunicorn start',
             'stop_signal': 'INT',
             'singleton': 'True',
             'autostart': 'True',
@@ -341,7 +441,7 @@ CIRCUS_WATCHERS = [
             'use_sockets': 'True',
             'singleton': 'False',
             'autostart': 'True',
-            'numprocesses': f'{max(OS_CPU_COUNT - 1, 1)}',
+            'numprocesses': f'{ASGI_SERVICE_PROCESSES}',
             'priority': '1',
         }
     },

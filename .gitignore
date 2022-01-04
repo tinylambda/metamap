@@ -129,3 +129,5 @@ static/tests/
 *.touch
 
 metamap/settings/local*
+
+run/
