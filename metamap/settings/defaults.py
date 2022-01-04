@@ -144,7 +144,7 @@ STATIC_URL = 'static/'
 # Where the static files go to when executing python manage.py collectstatic
 # https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-STATIC_ROOT
 
-STATIC_ROOT = f'/tmp/{MAIN_MODULE_NAME}/static_root/'  # Change this as needed
+STATIC_ROOT = f'/tmp/{MAIN_MODULE_NAME}/static_root/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
@@ -496,6 +496,16 @@ SERVICE_LEASE_DEFAULT_SECONDS = 20
 
 # A live service will refresh its lease when TTL is less than
 SERVICE_LEASE_REFRESH_WHEN_SMALLER_THAN = 5
+
+# Used for generating nginx configuration files for http and websocket service
+# Use python manage.py nginx create to generate the configuration files and copy them to your nginx conf.d directory
+NGINX_HTTP_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'nginx-http-{MAIN_MODULE_NAME}.conf')
+
+NGINX_WEBSOCKET_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'nginx-websocket-{MAIN_MODULE_NAME}.conf')
+
+NGINX_HTTP_SERVER_NAME = 'game-http.domain.com'
+
+NGINX_WEBSOCKET_SERVER_NAME = 'game-ws.domain.com'
 
 
 @atexit.register
