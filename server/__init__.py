@@ -6,21 +6,30 @@ import threading
 import uuid
 
 import aetcd3
+import attr
+import zmq.asyncio
 from django.conf import settings
 from uhashring import HashRing
 
 
 class ServerRoutineMeta(type):
     BASE_NAME = 'ServerRoutine'
-    SERVICES_CACHE_NAME = 'SERVICES'
+    SERVICES_NAME = 'SERVICES'
+    SERVICES_CANDIDATE_NAME = 'SERVICES_CANDIDATE'
     HASH_RING_NAME = 'HASH_RING'
 
     def __new__(mcs, clsname, bases, class_dict: dict):
         server_type = class_dict.get('SERVER_TYPE')
+
         if clsname != mcs.BASE_NAME and server_type is None:
             raise AttributeError('a server routine must specify SERVER_TYPE at class leve')
-        if mcs.SERVICES_CACHE_NAME not in class_dict:
-            class_dict[mcs.SERVICES_CACHE_NAME] = []
+
+        if mcs.SERVICES_NAME not in class_dict:
+            class_dict[mcs.SERVICES_NAME] = {}
+
+        if mcs.SERVICES_CANDIDATE_NAME not in class_dict:
+            class_dict[mcs.SERVICES_CANDIDATE_NAME] = {}
+
         if mcs.HASH_RING_NAME not in class_dict:
             class_dict[mcs.HASH_RING_NAME] = HashRing(nodes=[])
 
@@ -28,26 +37,34 @@ class ServerRoutineMeta(type):
         return cls
 
 
+@attr.s
 class ServerRoutine(metaclass=ServerRoutineMeta):
-    @classmethod
-    def _attach_loop(cls):
+    service_ready_event = attr.ib(default=attr.Factory(asyncio.Event))
+    zmq_context = attr.ib(default=attr.Factory(zmq.asyncio.Context))
+
+    def __attrs_post_init__(self):
+        self.socket = self.zmq_context.socket(zmq.REP)
+        self.selected_port = self.socket.bind_to_random_port('tcp://*', min_port=49152, max_port=65535, max_tries=64)
+
+        unique_id = uuid.uuid4().hex
+        self.service_key = os.path.join(self.service_directory, unique_id)
+
         if threading.current_thread() is not threading.main_thread():
-            logging.info('attaching loop in non-main thread')
             new_loop = asyncio.new_event_loop()
             asyncio.set_event_loop(new_loop)
-        else:
-            logging.info('use the default asyncio loop')
 
-    @classmethod
-    def _get_registry_prefix(cls):
-        return os.path.join(settings.SERVICE_ROOT, cls.SERVER_TYPE)
+    @property
+    def service_directory(self):
+        """Where to register this service instance"""
+        return os.path.join(settings.SERVICE_ROOT, self.__class__.__name__)
 
-    @classmethod
-    def _get_service_lock_key(cls):
-        return os.path.join(settings.SERVICE_LOCK_ROOT, cls.SERVER_TYPE)
+    @property
+    def service_lock(self):
+        """Require this lock to register this type of service instances"""
+        return os.path.join(settings.SERVICE_LOCK_ROOT, self.__class__.__name__)
 
-    @classmethod
-    def _get_ip(cls):
+    @property
+    def host_ip(self):
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         try:
             s.connect(('10.255.255.255', 1))
@@ -59,21 +76,24 @@ class ServerRoutine(metaclass=ServerRoutineMeta):
             s.close()
         return ip
 
-    def _generate_service_key(self):
-        return f'{self.__class__.SERVER_TYPE}_{uuid.uuid4().hex}'
+    async def register_self(self):
+        async with aetcd3.client(**settings.ETCD_KWARGS) as client:
+            async with client.lock(self.service_lock):
+                async for value, metadata in client.get_prefix(self.service_directory):
+                    self.__class__.SERVICES[metadata.key] = value
 
-    @classmethod
-    async def maintain_services(cls):
-        watch_prefix = cls._get_registry_prefix()
-        cls.SERVICES.clear()
-        async with aetcd3.client(**settings.ETCD_KWARGS) as aetcd3_client:
-            it, cancel = await aetcd3_client.watch_prefix(watch_prefix)
+    async def listen_service_changes(self):
+        async with aetcd3.client(**settings.ETCD_KWARGS) as client:
+            it, cancel = await client.watch_prefix(self.service_directory)
             async for event in it:
-                logging.info('detected event: %s', event)
+                pass
+
+    async def refresh_self(self):
+        pass
+
+    async def action_ping(self):
+        pass
 
     @classmethod
     def run(cls):
-        pass
-
-    async def refresh_self(self):
         pass
