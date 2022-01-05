@@ -88,3 +88,12 @@ Deploy in production environment
 
     # allow CSRF on your http server
     CSRF_TRUSTED_ORIGINS = ['https://game-http.domain.com',]
+
+Use nginx as proxy for HTTP and Websocket
+----
+.. code-block:: shell
+
+    # This will create sample nginx conf for HTTP and Websocket, you can change them as you need.
+    python manage.py nginx create
+
+
