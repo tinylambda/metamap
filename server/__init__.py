@@ -22,7 +22,7 @@ class ServerRoutineMeta(type):
         server_type = class_dict.get('SERVER_TYPE')
 
         if clsname != mcs.BASE_NAME and server_type is None:
-            raise AttributeError('a server routine must specify SERVER_TYPE at class leve')
+            raise AttributeError('a server routine must specify SERVER_TYPE at class level')
 
         if mcs.SERVICES_NAME not in class_dict:
             class_dict[mcs.SERVICES_NAME] = {}
@@ -39,6 +39,19 @@ class ServerRoutineMeta(type):
 
 @attr.s
 class ServerRoutine(metaclass=ServerRoutineMeta):
+    """
+    Service discovery flow:
+    1. Service A start. CHANGE_STATE: registering
+    2. A acquire service registration lock to prevent other service registering.
+    3. A start a task to listen changes of the service directory, if any events and state is registering, buffer them.
+    4. A get all the registered services from related service directory, let's say 5 registered services now
+    5. A create a CountDownLatch(5) condition.
+    5. A start main loop to listen on some socket with the CountDownLatch(5) condition, count_down if any ping message.
+    6. A wait on a CountDownLatch(5) to wait for 5 registered services to ping A
+    7. If CountDownLatch(5), CHANGE_STATE: registered
+    8. Apply the buffered events to put A to available services.
+    9. The following events will apply as normal to maintain the latest services
+    """
     service_ready_event = attr.ib(default=attr.Factory(asyncio.Event))
     zmq_context = attr.ib(default=attr.Factory(zmq.asyncio.Context))
 
@@ -48,10 +61,6 @@ class ServerRoutine(metaclass=ServerRoutineMeta):
 
         unique_id = uuid.uuid4().hex
         self.service_key = os.path.join(self.service_directory, unique_id)
-
-        if threading.current_thread() is not threading.main_thread():
-            new_loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(new_loop)
 
     @property
     def service_directory(self):
@@ -70,7 +79,7 @@ class ServerRoutine(metaclass=ServerRoutineMeta):
             s.connect(('10.255.255.255', 1))
             ip = s.getsockname()[0]
         except Exception as e:
-            logging.debug('error when try to get local ip address', exc_info=e)
+            logging.debug('Error when try to get local ip address', exc_info=e)
             ip = '127.0.0.1'
         finally:
             s.close()
@@ -81,6 +90,9 @@ class ServerRoutine(metaclass=ServerRoutineMeta):
             async with client.lock(self.service_lock):
                 async for value, metadata in client.get_prefix(self.service_directory):
                     self.__class__.SERVICES[metadata.key] = value
+
+    def add_service(self, key: bytes, value):
+        pass
 
     async def listen_service_changes(self):
         async with aetcd3.client(**settings.ETCD_KWARGS) as client:
