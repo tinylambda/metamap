@@ -612,11 +612,17 @@ SERVICE_ROOT = f'/{MAIN_MODULE_NAME}/services/'
 # Distributed locks used in this project
 SERVICE_LOCK_ROOT = f'/{MAIN_MODULE_NAME}/locks/'
 
-# How many seconds a service's lease
-SERVICE_LEASE_DEFAULT_SECONDS = 20
+# Service's lease
+SERVICE_LEASE_SECONDS = 10
 
-# A live service will refresh its lease when TTL is less than
-SERVICE_LEASE_REFRESH_WHEN_SMALLER_THAN = 5
+# Service will refresh lease every X seconds
+SERVICE_LEASE_REFRESH_INTERVAL_SECONDS = 5
+
+# Service execution mode: MASTER_SLAVE/INDEPENDENT_WORKERS
+SERVICE_RUN_MODE = 'MASTER_SLAVE'
+
+# Service workers number
+SERVICE_N_WORKERS = OS_CPU_COUNT
 
 # Used for generating nginx configuration files for http and websocket service
 # Use python manage.py nginx create to generate the configuration files and copy them to your nginx conf.d directory

@@ -1,40 +1,77 @@
 import asyncio
+import json
 import logging
 import os.path
 import socket
-import threading
 import uuid
 
 import aetcd3
 import attr
 import zmq.asyncio
+from aetcd3 import Event
 from django.conf import settings
-from uhashring import HashRing
 
 
 class ServerRoutineMeta(type):
+    """
+    SERVER CORE LOOP: INPUT => LOGIC => OUTPUT
+    """
     BASE_NAME = 'ServerRoutine'
-    SERVICES_NAME = 'SERVICES'
-    SERVICES_CANDIDATE_NAME = 'SERVICES_CANDIDATE'
-    HASH_RING_NAME = 'HASH_RING'
 
     def __new__(mcs, clsname, bases, class_dict: dict):
         server_type = class_dict.get('SERVER_TYPE')
-
         if clsname != mcs.BASE_NAME and server_type is None:
             raise AttributeError('a server routine must specify SERVER_TYPE at class level')
-
-        if mcs.SERVICES_NAME not in class_dict:
-            class_dict[mcs.SERVICES_NAME] = {}
-
-        if mcs.SERVICES_CANDIDATE_NAME not in class_dict:
-            class_dict[mcs.SERVICES_CANDIDATE_NAME] = {}
-
-        if mcs.HASH_RING_NAME not in class_dict:
-            class_dict[mcs.HASH_RING_NAME] = HashRing(nodes=[])
-
         cls = type.__new__(mcs, clsname, bases, class_dict)
         return cls
+
+    @property
+    def host_ip(cls):
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        try:
+            s.connect(('10.255.255.255', 1))
+            ip = s.getsockname()[0]
+        except Exception as e:
+            logging.debug('Error when try to get local ip address', exc_info=e)
+            ip = '127.0.0.1'
+        finally:
+            s.close()
+        return ip
+
+    def __init__(cls, clsname, bases, class_dict: dict):
+        cls.ASYNCIO_LOOP: asyncio.AbstractEventLoop = asyncio.get_event_loop()
+        cls.SD_EVENTS_BUFFER: list[Event] = []
+        cls.SERVICE_ZMQ_CONTEXT = zmq.asyncio.Context()
+        cls.SERVICE_SOCKET = cls.SERVICE_ZMQ_CONTEXT.socket(zmq.REP)
+        cls.SERVICE_HOST = cls.host_ip
+        cls.SERVICE_PORT = cls.SERVICE_SOCKET.bind_to_random_port('tcp://*',
+                                                                  min_port=49152,
+                                                                  max_port=65535,
+                                                                  max_tries=64)
+        cls.SERVICE_LOCK = os.path.join(settings.SERVICE_LOCK_ROOT, clsname)
+        cls.SERVICE_REGISTER_KEY = os.path.join(settings.SERVICE_ROOT, clsname, uuid.uuid4().hex)
+        cls.SERVICE_REGISTER_VALUE = json.dumps({
+            'host_ip': cls.SERVICE_HOST,
+            'port': cls.SERVICE_PORT,
+        })
+        cls.SERVICE_LEASE_SECONDS = settings.SERVICE_LEASE_SECONDS
+        cls.SERVICE_LEASE_REFRESH_INTERVAL_SECONDS = settings.SERVICE_LEASE_REFRESH_INTERVAL_SECONDS
+        cls.SERVICE_CLIENTS = {}
+
+        cls.EVENT_SERVICE_STOP = asyncio.Event()
+        cls.EVENT_FOUND_SELF = asyncio.Event()
+        cls.EVENT_LOOP_STARTED = asyncio.Event()
+        cls.EVENT_LISTEN_SERVICE_STARTED = asyncio.Event()
+
+        cls.QUEUE_INPUT = asyncio.Queue()
+        cls.QUEUE_OUTPUT = asyncio.Queue()
+
+        super(ServerRoutineMeta, cls).__init__(clsname, bases, class_dict)
+
+    def service_client(cls, host_ip, port, **kwargs):
+        instance = cls.SERVICE_ZMQ_CONTEXT.socket(zmq.REQ)
+        instance.connect(f'tcp://{host_ip}:{port}')
+        return instance
 
 
 @attr.s
