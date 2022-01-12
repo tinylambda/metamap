@@ -1,6 +1,6 @@
 django==4.0.1
 djangorestframework==3.13.1
-jupyterlab==3.2.6
+jupyterlab==3.2.7
 circus==0.17.1
 uwsgi==2.0.20
 uwsgitop==0.11

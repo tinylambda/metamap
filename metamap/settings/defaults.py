@@ -458,7 +458,7 @@ CIRCUSD_STATIC_CONFIG_LIST = [
             'statsd': 'False',
             'stats_endpoint': 'tcp://127.0.0.1:5557',
             'stats_close_outputs': 'False',
-            'check_delay': '5',
+            'check_delay': '15',
             'stream_backend': 'thread',
             'warmup_delay': '0',
             'debug': 'False',
