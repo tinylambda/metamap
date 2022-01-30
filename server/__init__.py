@@ -18,11 +18,11 @@ class ServerRoutineMeta(type):
     """
     BASE_NAME = 'ServerRoutine'
 
-    def __new__(mcs, clsname, bases, class_dict: dict):
+    def __new__(mcs, name, bases, class_dict: dict):
         server_type = class_dict.get('SERVER_TYPE')
-        if clsname != mcs.BASE_NAME and server_type is None:
+        if name != mcs.BASE_NAME and server_type is None:
             raise AttributeError('a server routine must specify SERVER_TYPE at class level')
-        cls = type.__new__(mcs, clsname, bases, class_dict)
+        cls = type.__new__(mcs, name, bases, class_dict)
         return cls
 
     @property
@@ -38,7 +38,7 @@ class ServerRoutineMeta(type):
             s.close()
         return ip
 
-    def __init__(cls, clsname, bases, class_dict: dict):
+    def __init__(cls, name, bases, class_dict: dict):
         cls.ASYNCIO_LOOP: asyncio.AbstractEventLoop = asyncio.get_event_loop()
         cls.SD_EVENTS_BUFFER: list[Event] = []
         cls.SERVICE_ZMQ_CONTEXT = zmq.asyncio.Context()
@@ -48,8 +48,8 @@ class ServerRoutineMeta(type):
                                                                   min_port=49152,
                                                                   max_port=65535,
                                                                   max_tries=64)
-        cls.SERVICE_LOCK = os.path.join(settings.SERVICE_LOCK_ROOT, clsname)
-        cls.SERVICE_REGISTER_KEY = os.path.join(settings.SERVICE_ROOT, clsname, uuid.uuid4().hex)
+        cls.SERVICE_LOCK = os.path.join(settings.SERVICE_LOCK_ROOT, name)
+        cls.SERVICE_REGISTER_KEY = os.path.join(settings.SERVICE_ROOT, name, uuid.uuid4().hex)
         cls.SERVICE_REGISTER_VALUE = json.dumps({
             'host_ip': cls.SERVICE_HOST,
             'port': cls.SERVICE_PORT,
@@ -66,7 +66,7 @@ class ServerRoutineMeta(type):
         cls.QUEUE_INPUT = asyncio.Queue()
         cls.QUEUE_OUTPUT = asyncio.Queue()
 
-        super(ServerRoutineMeta, cls).__init__(clsname, bases, class_dict)
+        super(ServerRoutineMeta, cls).__init__(name, bases, class_dict)
 
     def service_client(cls, host_ip, port, **kwargs):
         instance = cls.SERVICE_ZMQ_CONTEXT.socket(zmq.REQ)
