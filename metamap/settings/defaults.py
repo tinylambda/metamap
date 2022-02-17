@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'core',
     'access',
     'server',
+    'world',
 ]
 
 MIDDLEWARE = [
