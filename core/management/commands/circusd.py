@@ -1,5 +1,6 @@
 import os
 import subprocess
+from typing import List
 
 from django.conf import settings
 from django.core.management.base import CommandError
@@ -12,6 +13,7 @@ class Command(MetaCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("action", nargs="?", help="specify the action you want to run", type=str)
+        parser.add_argument('action_parameters', nargs="*", help="action parameters", type=str)
 
     @classmethod
     def prepare_configuration_files(cls):
@@ -34,7 +36,7 @@ class Command(MetaCommand):
             settings.CIRCUSD_CONFIG.write(f)
 
     @classmethod
-    def run_circusctl_cmd(cls, cmd_name=None):
+    def run_circusctl_cmd(cls, cmd_name=None, action_parameters: List[str] = None):
         circus_static_conf_list = getattr(settings, 'CIRCUSD_STATIC_CONFIG_LIST')
         circus_section = None
         for item in circus_static_conf_list:
@@ -46,6 +48,7 @@ class Command(MetaCommand):
         cmd.extend(['--endpoint', circus_endpoint])
         if cmd_name:
             cmd.append(cmd_name)
+            cmd.extend(action_parameters if action_parameters is not None else [])
         try:
             subprocess.run(cmd)
         except KeyboardInterrupt:
@@ -79,8 +82,10 @@ class Command(MetaCommand):
 
     @classmethod
     def action_status(cls, *args, **options):
-        cls.run_circusctl_cmd('stats')
+        action_parameters = options.get('action_parameters', [])
+        cls.run_circusctl_cmd('stats', action_parameters)
 
     @classmethod
     def action_reload(cls, *args, **options):
-        cls.run_circusctl_cmd('reload')
+        action_parameters = options.get('action_parameters', [])
+        cls.run_circusctl_cmd('reload', action_parameters)
