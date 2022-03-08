@@ -18,7 +18,10 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
+from server.views import ServerView
+
 urlpatterns = [
+    path('servers/', ServerView.as_view()),
     path('admin/', admin.site.urls),
 ]
 
