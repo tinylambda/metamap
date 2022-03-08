@@ -26,7 +26,14 @@ class AccessConsumer(AsyncWebsocketConsumer):
             'message': f'{self.channel_name} joined!',
         })
 
+    async def say_bye(self):
+        await self.channel_layer.group_send(self.group_name, {
+            'type': 'handle_message',
+            'message': f'{self.channel_name} left!'
+        })
+
     async def disconnect(self, code):
+        await self.say_bye()
         await self.channel_layer.group_discard(self.group_name, self.channel_name)
 
     async def receive(self, text_data=None, bytes_data=None):
