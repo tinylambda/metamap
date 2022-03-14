@@ -1,3 +1,4 @@
+import argparse
 import asyncio
 import json
 import logging
@@ -5,6 +6,7 @@ import signal
 import sys
 import time
 from typing import Callable
+from urllib.parse import urljoin, urlencode, parse_qsl, urlunsplit
 
 import attr
 import websockets
@@ -155,9 +157,30 @@ class WebsocketClient:
 
 
 if __name__ == '__main__':
-    WebsocketClient.start_with_retry(uri='ws://localhost:8000/ws/access/cc/?x=100',
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--host', action='store', dest='host', type=str, default='localhost')
+    parser.add_argument('--port', action='store', dest='port', type=int, default=8000)
+    parser.add_argument('--path', action='store', dest='path', type=str, default='/ws/access/')
+    parser.add_argument('--group', action='store', dest='group', type=str, default='defaultGroup/')
+    parser.add_argument('--query-args', action='store', dest='query_args', type=str, default='')
+    parser.add_argument('--use-ssl', action='store_true', dest='use_ssl', default=False)
+    ns = parser.parse_args()
+
+    scheme = 'wss' if ns.use_ssl else 'ws'
+    netloc = f'{ns.host}:{ns.port}'
+    path = urljoin(ns.path, ns.group)
+    if ns.query_args:
+        query = urlencode(parse_qsl(ns.query_args))
+    else:
+        query = ''
+    fragment = ''
+    uri = urlunsplit((scheme, netloc, path, query, fragment))
+    logging.warning('Connect to %s', uri)
+    WebsocketClient.start_with_retry(uri=uri,
                                      on_open=lambda: print('connected'),
                                      on_message=lambda msg: print(f'--{msg}--'),
                                      on_error=lambda e: print(e),
                                      on_close=lambda e: print('on_close: bye'),
                                      max_retry_times=10000)
+
+    # python core/utils/ws_client.py --query-args 'a=100&b=200'
