@@ -89,7 +89,14 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            'hosts': [
+                'redis://127.0.0.1:6379/0',
+                'redis://127.0.0.1:6379/1',
+            ],
+            'expiry': 60,
+            'group_expiry': 86400,
+            'capacity': 100,
+            'channel_capacity': {},
         },
     },
 }
