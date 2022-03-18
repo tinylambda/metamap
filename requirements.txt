@@ -1,12 +1,12 @@
 django==4.0.3
 djangorestframework==3.13.1
-jupyterlab==3.3.0
+jupyterlab==3.3.2
 circus==0.17.1
 uwsgi==2.0.20
 uwsgitop==0.11
 daphne==3.0.2
 channels==3.0.4
-channels-redis==3.3.1
+channels-redis==3.4.0
 websockets==10.2
 attrs==21.4.0
 aetcd3==0.1.0a7
