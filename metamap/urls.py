@@ -16,13 +16,14 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 from server.views import ServerView
 
 urlpatterns = [
     path('servers/', ServerView.as_view()),
     path('admin/', admin.site.urls),
+    path('', include('django_prometheus.urls')),
 ]
 
 # For debug purpose only
