@@ -20,7 +20,11 @@ from django.urls import path, include
 
 from server.views import ServerView
 
+from .api import api
+
+
 urlpatterns = [
+    path('api/', api.urls),
     path('servers/', ServerView.as_view()),
     path('admin/', admin.site.urls),
     path('', include('django_prometheus.urls')),

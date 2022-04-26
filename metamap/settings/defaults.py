@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_prometheus',
+    'ninja',
     'account',
     'core',
     'access',

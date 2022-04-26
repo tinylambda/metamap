@@ -1,5 +1,7 @@
 django==4.0.3
 djangorestframework==3.13.1
+django-prometheus==2.2.0
+django-ninja==0.17.0
 jupyterlab==3.3.2
 circus==0.17.1
 uwsgi==2.0.20
@@ -13,4 +15,3 @@ aetcd3==0.1.0a7
 mysqlclient==2.1.0
 uhashring==2.1
 gunicorn==20.1.0
-django-prometheus==2.2.0
