@@ -639,6 +639,18 @@ NGINX_HTTP_SERVER_NAME = 'game-http.domain.com'
 NGINX_WEBSOCKET_SERVER_NAME = 'game-ws.domain.com'
 
 
+PROMETHEUS_METRIC_NAMESPACE = 'metamap'
+
+PROMETHEUS_LATENCY_BUCKETS = (
+    0.01,
+    0.025,
+    0.05,
+    0.075,
+    0.1,
+    float("inf"),
+)
+
+
 @atexit.register
 def cleanup():
     """
