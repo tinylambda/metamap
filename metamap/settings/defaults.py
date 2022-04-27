@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_prometheus',
     'ninja',
+    'ninja_extra',
     'account',
     'core',
     'access',

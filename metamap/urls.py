@@ -20,11 +20,12 @@ from django.urls import path, include
 
 from server.views import ServerView
 
-from .api import api
+from .api import api, api_extra
 
 
 urlpatterns = [
     path('api/', api.urls),
+    path('api-extra/', api_extra.urls),
     path('servers/', ServerView.as_view()),
     path('admin/', admin.site.urls),
     path('', include('django_prometheus.urls')),
