@@ -1,10 +1,6 @@
-from django.http import HttpRequest
+from django.utils.deprecation import MiddlewareMixin
 
 
-class CoreMiddleware:
+class CoreMiddleware(MiddlewareMixin):
     def __init__(self, get_response):
-        self.get_response = get_response
-
-    def __call__(self, request: HttpRequest):
-        response = self.get_response(request)
-        return response
+        super(CoreMiddleware, self).__init__(get_response)
