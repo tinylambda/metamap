@@ -2,3 +2,9 @@
 line-length = 88
 skip-string-normalization = true
 skip-magic-trailing-comma = false
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "metamap.settings"
+python_files = "tests.py test_*.py tests/test_*.py"
+addopts = "--nomigrations"
+asyncio_mode = "auto"
