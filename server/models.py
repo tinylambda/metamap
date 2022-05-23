@@ -15,3 +15,10 @@ class BadTable(models.Model):
         db_constraint=False,
     )
     change_time = models.DateTimeField(auto_now_add=True)
+
+
+class Server(models.Model):
+    name = models.CharField(max_length=64)
+    ip = models.CharField(max_length=128)
+    date_added = models.DateTimeField(auto_now_add=True)
+    date_change = models.DateTimeField(auto_now=True)
