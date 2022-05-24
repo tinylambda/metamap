@@ -52,6 +52,11 @@ def test_show_raw_sql(transactional_db, sample_good):
     sample_good.save()
     assert len(connection.queries) == 3
 
+    records = GoodTable.objects.all()[10:20]
+    records.count()
+    # trigger a limit offset sql
+    assert len(connection.queries) == 4
+
 
 def test_ninja_schema():
     from metamap.api import CreateServerArgs, SearchServerArgs
