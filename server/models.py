@@ -7,6 +7,11 @@ class GoodTable(models.Model):
     content = models.TextField(default='')
 
 
+class BadProfile(models.Model):
+    address = models.CharField(max_length=128)
+    birthday = models.DateField(auto_now=True)
+
+
 class BadTable(models.Model):
     good_table = models.ForeignKey(
         GoodTable,
@@ -15,6 +20,13 @@ class BadTable(models.Model):
         db_constraint=False,
     )
     change_time = models.DateTimeField(auto_now_add=True)
+    profile = models.OneToOneField(
+        BadProfile,
+        on_delete=models.CASCADE,
+        related_name='profile_bad_table',
+        blank=True,
+        null=True,
+    )
 
 
 class Server(models.Model):

@@ -43,6 +43,7 @@ def test_foreign_key(transactional_db, sample_good):
 
 def test_show_raw_sql(transactional_db, sample_good):
     from django.db import connection
+    from django.db.models.query_utils import Q
 
     sample_good.name = 'my name sample'
     sample_good.save()
@@ -56,6 +57,13 @@ def test_show_raw_sql(transactional_db, sample_good):
     records.count()
     # trigger a limit offset sql
     assert len(connection.queries) == 4
+
+    q = Q(name='A')
+    q &= Q(name='B')
+    # q is False condition
+    records = GoodTable.objects.filter(q)
+    assert records.count() == 0
+    assert len(connection.queries) == 5
 
 
 def test_ninja_schema():
