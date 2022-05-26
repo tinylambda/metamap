@@ -1,5 +1,5 @@
 import pytest
-from django.db import IntegrityError, transaction
+from django.db import IntegrityError, transaction, connections
 from pydantic import ValidationError
 
 from .models import GoodTable, BadTable, StatsVendor
@@ -27,16 +27,12 @@ def test_model_save(transactional_db):
 
     with pytest.raises(IntegrityError) as e:
         record.save(force_insert=True)
-    assert e.value.args[0] == 'UNIQUE constraint failed: server_goodtable.id'
 
 
 def test_foreign_key(transactional_db, sample_good):
     bad = BadTable()
     with pytest.raises(IntegrityError) as e:
         bad.save()
-    assert (
-        e.value.args[0] == 'NOT NULL constraint failed: server_badtable.good_table_id'
-    )
 
 
 def test_show_raw_sql(transactional_db, sample_good):
@@ -46,22 +42,25 @@ def test_show_raw_sql(transactional_db, sample_good):
     sample_good.name = 'my name sample'
     sample_good.save()
 
-    assert len(connection.queries) == 2
+    sql_count = len(connection.queries)
 
     sample_good.save()
-    assert len(connection.queries) == 3
+    assert len(connection.queries) == sql_count + 1
+    sql_count += 1
 
     records = GoodTable.objects.all()[10:20]
     records.count()
     # trigger a limit offset sql
-    assert len(connection.queries) == 4
+    assert len(connection.queries) == sql_count + 1
+    sql_count += 1
 
     q = Q(name='A')
     q &= Q(name='B')
     # q is False condition
     records = GoodTable.objects.filter(q)
     assert records.count() == 0
-    assert len(connection.queries) == 5
+    assert len(connection.queries) == sql_count + 1
+    sql_count += 1
 
 
 def test_ninja_schema():
@@ -101,11 +100,10 @@ def test_transaction(transactional_db):
 
 
 def test_transaction_with_raw_sql(transactional_db):
-    from django.db import connections
-
+    conn = connections['default']
     with pytest.raises(RuntimeError):
         with transaction.atomic():
-            with connections['default'].cursor() as cursor:
+            with conn.cursor() as cursor:
                 cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (10)')
                 cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (20)')
                 raise RuntimeError
@@ -113,9 +111,30 @@ def test_transaction_with_raw_sql(transactional_db):
     assert StatsVendor.objects.count() == 0
 
     with pytest.raises(RuntimeError):
-        with connections['default'].cursor() as cursor:
+        with conn.cursor() as cursor:
             cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (10)')
             cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (20)')
             raise RuntimeError
 
     assert StatsVendor.objects.count() == 2
+
+    with transaction.atomic():
+        with conn.cursor() as cursor:
+            cursor.execute('DELETE FROM server_statsvendor')
+            cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (10)')
+    assert StatsVendor.objects.count() == 1
+    conn.close()
+
+
+def test_db_connection(transactional_db):
+    from django.db.backends.mysql.base import DatabaseWrapper
+
+    conn: DatabaseWrapper = connections['default']
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM server_statsvendor')
+    conn.close()
+
+    conn: DatabaseWrapper = connections['default']
+    with conn.cursor() as cursor:
+        cursor.execute('SELECT * FROM server_statsvendor')
+    conn.close()
