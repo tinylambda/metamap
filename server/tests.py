@@ -1,5 +1,3 @@
-from pprint import pprint
-
 import pytest
 from django.db import IntegrityError, transaction
 from pydantic import ValidationError
@@ -100,3 +98,24 @@ def test_transaction(transactional_db):
         raise RuntimeError('Simulate an error')
 
     assert StatsVendor.objects.count() == 3
+
+
+def test_transaction_with_raw_sql(transactional_db):
+    from django.db import connections
+
+    with pytest.raises(RuntimeError):
+        with transaction.atomic():
+            with connections['default'].cursor() as cursor:
+                cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (10)')
+                cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (20)')
+                raise RuntimeError
+
+    assert StatsVendor.objects.count() == 0
+
+    with pytest.raises(RuntimeError):
+        with connections['default'].cursor() as cursor:
+            cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (10)')
+            cursor.execute('INSERT INTO server_statsvendor (vendor_id) VALUES (20)')
+            raise RuntimeError
+
+    assert StatsVendor.objects.count() == 2

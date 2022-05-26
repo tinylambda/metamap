@@ -39,6 +39,9 @@ class Server(models.Model):
 class StatsVendor(models.Model):
     vendor_id = models.IntegerField(null=True, db_index=True)
     total_earned = models.FloatField(null=True)
-    project_count = models.BigIntegerField(default=0)
-    project_not_complete_count = models.BigIntegerField(default=0)
-    ongoing_tickets = models.BigIntegerField(default=0)
+    project_count = models.BigIntegerField(null=True, default=0)
+    project_not_complete_count = models.BigIntegerField(null=True, default=0)
+    ongoing_tickets = models.BigIntegerField(null=True, default=0)
+
+    def __str__(self):
+        return f'StatsVendor(vendor_id={self.vendor_id})'
