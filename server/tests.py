@@ -1,10 +1,10 @@
 from pprint import pprint
 
 import pytest
-from django.db import IntegrityError
+from django.db import IntegrityError, transaction
 from pydantic import ValidationError
 
-from .models import GoodTable, BadTable
+from .models import GoodTable, BadTable, StatsVendor
 
 
 @pytest.fixture(autouse=True)
@@ -78,3 +78,25 @@ def test_ninja_schema():
     CreateServerArgs(name='s1', ip='127.0.0.1')
 
     SearchServerArgs(name='s1')
+
+
+def test_transaction(transactional_db):
+    with pytest.raises(RuntimeError):
+        with transaction.atomic():
+            # avoid partial update
+            StatsVendor.objects.create(vendor_id=1)
+            StatsVendor.objects.create(vendor_id=2)
+            raise RuntimeError('Simulate an error')
+    assert StatsVendor.objects.count() == 0
+
+    with transaction.atomic():
+        StatsVendor.objects.create(vendor_id=1)
+    assert StatsVendor.objects.count() == 1
+
+    with pytest.raises(RuntimeError):
+        # partial update without atomic
+        StatsVendor.objects.create(vendor_id=2)
+        StatsVendor.objects.create(vendor_id=3)
+        raise RuntimeError('Simulate an error')
+
+    assert StatsVendor.objects.count() == 3

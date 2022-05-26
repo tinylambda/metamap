@@ -34,3 +34,11 @@ class Server(models.Model):
     ip = models.CharField(max_length=128)
     date_added = models.DateTimeField(auto_now_add=True)
     date_change = models.DateTimeField(auto_now=True)
+
+
+class StatsVendor(models.Model):
+    vendor_id = models.IntegerField(null=True, db_index=True)
+    total_earned = models.FloatField(null=True)
+    project_count = models.BigIntegerField(default=0)
+    project_not_complete_count = models.BigIntegerField(default=0)
+    ongoing_tickets = models.BigIntegerField(default=0)
