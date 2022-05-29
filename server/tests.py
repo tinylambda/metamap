@@ -1,8 +1,10 @@
 import pytest
 from django.db import IntegrityError, transaction, connections
+from django.db.models import IntegerField
+from django.db.models.functions import Cast
 from pydantic import ValidationError
 
-from .models import GoodTable, BadTable, StatsVendor
+from .models import GoodTable, BadTable, StatsVendor, Server
 
 
 @pytest.fixture(autouse=True)
@@ -138,3 +140,22 @@ def test_db_connection(transactional_db):
     with conn.cursor() as cursor:
         cursor.execute('SELECT * FROM server_statsvendor')
     conn.close()
+
+
+def test_annotate(transactional_db):
+    server = Server.objects.create(name='s1', ip='127.0.0.1')
+
+    from django.db.models import QuerySet
+
+    qs: QuerySet = Server.objects.filter(name='s1')
+    qs: QuerySet = qs.annotate(
+        date_added_as_int=Cast('date_added', output_field=IntegerField())
+    )
+    from django.db import connection
+
+    for item in qs.all():
+        print(item.date_added_as_int)
+        print(item.date_added)
+
+    for query in connection.queries:
+        print(query['sql'])
