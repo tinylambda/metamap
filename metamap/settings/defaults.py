@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_prometheus',
+    'django_data',
     'ninja',
     'ninja_extra',
     'account',
@@ -192,12 +193,8 @@ LOGGING = {
         }
     },
     'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': 'INFO',
-            'propagate': False
-        },
-    }
+        'django': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
+    },
 }
 
 OS_CPU_COUNT = os.cpu_count()
@@ -420,7 +417,9 @@ raw_paste_global_conf = []
 # Strip spaces present between the header name and the the :.
 strip_header_spaces = False
 '''
-GUNICORN_CONFIG_FILENAME = os.path.join(BASE_DIR, 'run', f'gunicorn_{MAIN_MODULE_NAME}.py')
+GUNICORN_CONFIG_FILENAME = os.path.join(
+    BASE_DIR, 'run', f'gunicorn_{MAIN_MODULE_NAME}.py'
+)
 
 UWSGI_CONFIG = ConfigWriterWithRepeatKeys()
 UWSGI_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.ini')
@@ -442,7 +441,9 @@ UWSGI_INSTANCE_CONFIG = {
     'max-requests': '5000',
     'max-requests-delta': '3',
     'lazy-apps': 'true',
-    'touch-chain-reload': os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.touch'),
+    'touch-chain-reload': os.path.join(
+        BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.touch'
+    ),
     'disable-logging': 'false',
     'log-master': 'true',  # delegate logging to master process
     'stats': '127.0.0.1:9191',
@@ -480,8 +481,8 @@ CIRCUSD_STATIC_CONFIG_LIST = [
             'umask': '002',
             'loglevel': 'INFO',
             'logoutput': '-',
-            'loggerconfig': ''
-        }
+            'loggerconfig': '',
+        },
     },
 ]
 
@@ -509,12 +510,16 @@ CIRCUS_WATCHER_DEFAULT_SETTINGS = {
     'autostart': 'False',
     'numprocesses': '1',
     'stderr_stream.class': 'FileStream',
-    'stderr_stream.filename': os.path.join(CIRCUSD_LOG_ROOT_DIR, '{watcher_name:s}.error.log'),
+    'stderr_stream.filename': os.path.join(
+        CIRCUSD_LOG_ROOT_DIR, '{watcher_name:s}.error.log'
+    ),
     'stderr_stream.time_format': '%Y-%m-%d %H:%M:%S',
     'stderr_stream.max_bytes': '1073741824',
     'stderr_stream.backup_count': '5',
     'stdout_stream.class': 'FileStream',
-    'stdout_stream.filename': os.path.join(CIRCUSD_LOG_ROOT_DIR, '{watcher_name:s}.info.log'),
+    'stdout_stream.filename': os.path.join(
+        CIRCUSD_LOG_ROOT_DIR, '{watcher_name:s}.info.log'
+    ),
     'stdout_stream.time_format': '%Y-%m-%d %H:%M:%S',
     'stdout_stream.max_bytes': '1073741824',
     'stdout_stream.backup_count': '5',
@@ -531,29 +536,27 @@ CIRCUS_WATCHER_DEFAULT_SETTINGS = {
     'use_sockets': 'False',
     # 'max_age': '100000',  # Default disabled
     # 'max_age_variance': ,  # Variate above
-    'virtualenv': os.path.join(BASE_DIR, 'venv'),  # root of a virtualenv directory. need copy_env to be True
+    'virtualenv': os.path.join(
+        BASE_DIR, 'venv'
+    ),  # root of a virtualenv directory. need copy_env to be True
     # 'virtualenv_py_ver': '',  # specify python version, must be used with virtualenv
     'respawn': 'True',  # If set to False, the processes handled by a watcher will not be respawned automatically.
     # 'use_papa': 'False',
 }
 
-CIRCUS_SOCKETS = [{
-    'name': f'{MAIN_MODULE_NAME}_ASGI',
-    'settings': {
-        'host': '127.0.0.1',
-        'port': '20000',
-    }
-}]
-
-CIRCUS_ENVS = [
-    {
-        'name': f'{MAIN_MODULE_NAME}_HTTP',
-        'settings': {}
-    },
+CIRCUS_SOCKETS = [
     {
         'name': f'{MAIN_MODULE_NAME}_ASGI',
-        'settings': {}
-    },
+        'settings': {
+            'host': '127.0.0.1',
+            'port': '20000',
+        },
+    }
+]
+
+CIRCUS_ENVS = [
+    {'name': f'{MAIN_MODULE_NAME}_HTTP', 'settings': {}},
+    {'name': f'{MAIN_MODULE_NAME}_ASGI', 'settings': {}},
 ]
 
 CIRCUS_WATCHERS = [
@@ -565,7 +568,7 @@ CIRCUS_WATCHERS = [
             'singleton': 'True',
             'autostart': 'True',
             'use_sockets': 'False',
-        }
+        },
     },
     {
         'name': f'daphne',
@@ -577,7 +580,7 @@ CIRCUS_WATCHERS = [
             'autostart': 'True',
             'numprocesses': f'{ASGI_SERVICE_PROCESSES}',
             'priority': '1',
-        }
+        },
     },
 ]
 
@@ -633,9 +636,13 @@ SERVICE_LEASE_REFRESH_WHEN_SMALLER_THAN = 5
 
 # Used for generating nginx configuration files for http and websocket service
 # Use python manage.py nginx create to generate the configuration files and copy them to your nginx conf.d directory
-NGINX_HTTP_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'nginx-http-{MAIN_MODULE_NAME}.conf')
+NGINX_HTTP_CONF_FILENAME = os.path.join(
+    BASE_DIR, 'run', f'nginx-http-{MAIN_MODULE_NAME}.conf'
+)
 
-NGINX_WEBSOCKET_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'nginx-websocket-{MAIN_MODULE_NAME}.conf')
+NGINX_WEBSOCKET_CONF_FILENAME = os.path.join(
+    BASE_DIR, 'run', f'nginx-websocket-{MAIN_MODULE_NAME}.conf'
+)
 
 NGINX_HTTP_SERVER_NAME = 'game-http.domain.com'
 
