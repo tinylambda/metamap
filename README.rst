@@ -97,3 +97,11 @@ Use nginx as proxy for HTTP and Websocket
     python manage.py nginx create
 
 
+Activate pre-commit
+----
+.. code-block:: shell
+
+    # Install .git pre-commit hooks
+    pre-commit install
+    # Then enjoy it.
+
