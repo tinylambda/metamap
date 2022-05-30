@@ -88,7 +88,11 @@ TEMPLATES = [
     },
 ]
 
+# https://docs.djangoproject.com/en/4.0/ref/settings/#wsgi-application
+
 WSGI_APPLICATION = f'{MAIN_MODULE_NAME}.wsgi.application'
+
+# https://docs.djangoproject.com/en/4.0/howto/deployment/asgi/
 
 ASGI_APPLICATION = f'{MAIN_MODULE_NAME}.asgi.application'
 

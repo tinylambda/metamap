@@ -21,8 +21,7 @@ class ConfigWriterWithRepeatKeys(ConfigParser):
         """write a single section to the specified fp"""
         fp.write('[{}]\n'.format(section_name))
         for key, value in section_items:
-            value = self._interpolation.before_write(self, section_name, key,
-                                                     value)
+            value = self._interpolation.before_write(self, section_name, key, value)
             if value is not None or not self._allow_no_value:
                 if isinstance(value, str):
                     value = delimiter + str(value).replace('\n', '\n\t')

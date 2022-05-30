@@ -13,7 +13,9 @@ class Command(MetaCommand):
     help = "Manage uWSGI service"
 
     def add_arguments(self, parser):
-        parser.add_argument("action", nargs="?", help="specify the action you want to run", type=str)
+        parser.add_argument(
+            "action", nargs="?", help="specify the action you want to run", type=str
+        )
 
     @classmethod
     def prepare_configuration_files(cls):
@@ -63,12 +65,16 @@ class Command(MetaCommand):
             except KeyboardInterrupt:
                 pass
         else:
-            raise CommandError("Cannot find the PID file of uWSGI server, is the server running?")
+            raise CommandError(
+                "Cannot find the PID file of uWSGI server, is the server running?"
+            )
 
     @classmethod
     def action_reload(cls, *args, **options):
         try:
-            touch_chain_reload = settings.UWSGI_CONFIG.get("uwsgi", "touch-chain-reload")
+            touch_chain_reload = settings.UWSGI_CONFIG.get(
+                "uwsgi", "touch-chain-reload"
+            )
         except NoOptionError:
             touch_chain_reload = None
 

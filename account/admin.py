@@ -8,13 +8,16 @@ from account.models import User
 
 class CustomUserAdmin(UserAdmin):
     list_display = ('email', 'username', 'first_name', 'last_name', 'is_staff')
-    ordering = ('email', )
+    ordering = ('email',)
 
     add_fieldsets = (
-        (None, {
-            'classes': ('wide',),
-            'fields': ('email', 'password1', 'password2'),
-        }),
+        (
+            None,
+            {
+                'classes': ('wide',),
+                'fields': ('email', 'password1', 'password2'),
+            },
+        ),
     )
 
 

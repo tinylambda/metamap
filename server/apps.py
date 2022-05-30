@@ -12,6 +12,7 @@ class ServerConfig(AppConfig):
 
     def ready(self):
         from server import servers
+
         servers_module = inspect.getmodule(servers)
 
         logging.info('loading all server implementations from server.servers module')

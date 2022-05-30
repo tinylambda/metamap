@@ -12,8 +12,12 @@ class Command(MetaCommand):
     help = "Manage the circusd service"
 
     def add_arguments(self, parser):
-        parser.add_argument("action", nargs="?", help="specify the action you want to run", type=str)
-        parser.add_argument('action_parameters', nargs="*", help="action parameters", type=str)
+        parser.add_argument(
+            "action", nargs="?", help="specify the action you want to run", type=str
+        )
+        parser.add_argument(
+            'action_parameters', nargs="*", help="action parameters", type=str
+        )
 
     @classmethod
     def prepare_configuration_files(cls):
@@ -64,7 +68,9 @@ class Command(MetaCommand):
         conf_filename = getattr(settings, 'CIRCUSD_CONF_FILENAME', None)
         cmd = ["circusd"]
         cmd.extend(['--daemon'])
-        circusd_logfile = os.path.join(getattr(settings, 'CIRCUSD_LOG_ROOT_DIR', '/tmp/'), 'circusd.log')
+        circusd_logfile = os.path.join(
+            getattr(settings, 'CIRCUSD_LOG_ROOT_DIR', '/tmp/'), 'circusd.log'
+        )
         cmd.extend(['--log-output', circusd_logfile])
         cmd.extend([conf_filename])
         try:

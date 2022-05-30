@@ -17,9 +17,11 @@ import access.routing
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'metamap.settings')
 
-application = ProtocolTypeRouter({
-    'http': get_asgi_application(),
-    'websocket': AuthMiddlewareStack(
-        URLRouter(access.routing.websocket_urlpatterns)
-    )
-})
+application = ProtocolTypeRouter(
+    {
+        'http': get_asgi_application(),
+        'websocket': AuthMiddlewareStack(
+            URLRouter(access.routing.websocket_urlpatterns)
+        ),
+    }
+)

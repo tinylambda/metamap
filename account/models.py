@@ -51,14 +51,16 @@ class User(AbstractBaseUser, PermissionsMixin):
         unique=True,
         help_text=_('Required. valid email address'),
         error_messages={'unique': _("email must be unique")},
-        validators=[validate_email]
+        validators=[validate_email],
     )
     username = models.CharField(
         _('username'),
         max_length=150,
         blank=True,
         null=True,
-        help_text=_('Optional. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'),
+        help_text=_(
+            'Optional. 150 characters or fewer. Letters, digits and @/./+/-/_ only.'
+        ),
         validators=[username_validator],
     )
     first_name = models.CharField(_('first name'), max_length=150, blank=True)

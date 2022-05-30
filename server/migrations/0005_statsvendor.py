@@ -13,7 +13,15 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='StatsVendor',
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                (
+                    'id',
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name='ID',
+                    ),
+                ),
                 ('vendor_id', models.IntegerField(db_index=True, null=True)),
                 ('total_earned', models.FloatField(null=True)),
                 ('project_count', models.BigIntegerField(default=0)),

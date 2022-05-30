@@ -38,8 +38,12 @@ class WebsocketClient:
         self.event_loop = asyncio.get_event_loop()
         signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
         for s in signals:
-            self.event_loop.add_signal_handler(s, lambda _s=s: asyncio.create_task(
-                self.shutdown(loop=self.event_loop, sig=_s)))
+            self.event_loop.add_signal_handler(
+                s,
+                lambda _s=s: asyncio.create_task(
+                    self.shutdown(loop=self.event_loop, sig=_s)
+                ),
+            )
         self.event_loop.set_exception_handler(self.handle_exception)
 
     @staticmethod
@@ -61,7 +65,11 @@ class WebsocketClient:
     async def shutdown(self, loop: asyncio.AbstractEventLoop, sig=None, reason=None):
         self.shutdown_signal = sig
         self.shutdown_reason = reason
-        logging.warning('shutdown with signal=%s and reason=%s', self.shutdown_signal, self.shutdown_reason)
+        logging.warning(
+            'shutdown with signal=%s and reason=%s',
+            self.shutdown_signal,
+            self.shutdown_reason,
+        )
 
         try:
             tasks = [t for t in asyncio.all_tasks() if t is not asyncio.current_task()]
@@ -70,7 +78,10 @@ class WebsocketClient:
             if self.ws is not None:
                 await self.ws.close()
         except Exception as e:
-            logging.warning('shutdown encounter an error, find the root cause and fix it asap', exc_info=e)
+            logging.warning(
+                'shutdown encounter an error, find the root cause and fix it asap',
+                exc_info=e,
+            )
         finally:
             loop.stop()
 
@@ -91,9 +102,7 @@ class WebsocketClient:
         if self.user_input_task.done():
             event: dict = self.user_input_task.result()
             value = event.get('value')
-            data_dict = {
-                'message': value
-            }
+            data_dict = {'message': value}
             data_json = json.dumps(data_dict)
             data_bytes = data_json.encode('utf-8')
             await self.ws.send(data_bytes)
@@ -114,7 +123,9 @@ class WebsocketClient:
             self.ws_recv_task = self.get_recv_task()
 
     async def _run(self):
-        async with websockets.connect(self.uri, extra_headers=self.extra_headers) as client_side_ws:
+        async with websockets.connect(
+            self.uri, extra_headers=self.extra_headers
+        ) as client_side_ws:
             # increment connect tried times
             self.__class__.CONN_TRIED_TIMES = 0
 
@@ -124,7 +135,10 @@ class WebsocketClient:
             self.user_input_task = self.get_input_task()
 
             while True:
-                await asyncio.wait([self.ws_recv_task, self.user_input_task], return_when=asyncio.FIRST_COMPLETED)
+                await asyncio.wait(
+                    [self.ws_recv_task, self.user_input_task],
+                    return_when=asyncio.FIRST_COMPLETED,
+                )
                 await self.handle_user_input()
                 await self.handle_ws_recv()
 
@@ -134,8 +148,23 @@ class WebsocketClient:
         self.event_loop.run_forever()
 
     @classmethod
-    def start(cls, uri=None, on_open=None, on_message=None, on_error=None, on_close=None, **kwargs):
-        client = cls(uri=uri, on_open=on_open, on_message=on_message, on_error=on_error, on_close=on_close, **kwargs)
+    def start(
+        cls,
+        uri=None,
+        on_open=None,
+        on_message=None,
+        on_error=None,
+        on_close=None,
+        **kwargs,
+    ):
+        client = cls(
+            uri=uri,
+            on_open=on_open,
+            on_message=on_message,
+            on_error=on_error,
+            on_close=on_close,
+            **kwargs,
+        )
         client.run()
         return client.shutdown_normal()
 
@@ -158,11 +187,19 @@ class WebsocketClient:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--host', action='store', dest='host', type=str, default='localhost')
+    parser.add_argument(
+        '--host', action='store', dest='host', type=str, default='localhost'
+    )
     parser.add_argument('--port', action='store', dest='port', type=int, default=8000)
-    parser.add_argument('--path', action='store', dest='path', type=str, default='/ws/access/')
-    parser.add_argument('--group', action='store', dest='group', type=str, default='defaultGroup/')
-    parser.add_argument('--query-args', action='store', dest='query_args', type=str, default='')
+    parser.add_argument(
+        '--path', action='store', dest='path', type=str, default='/ws/access/'
+    )
+    parser.add_argument(
+        '--group', action='store', dest='group', type=str, default='defaultGroup/'
+    )
+    parser.add_argument(
+        '--query-args', action='store', dest='query_args', type=str, default=''
+    )
     parser.add_argument('--use-ssl', action='store_true', dest='use_ssl', default=False)
     ns = parser.parse_args()
 
@@ -176,11 +213,13 @@ if __name__ == '__main__':
     fragment = ''
     uri = urlunsplit((scheme, netloc, path, query, fragment))
     logging.warning('Connect to %s', uri)
-    WebsocketClient.start_with_retry(uri=uri,
-                                     on_open=lambda: print('connected'),
-                                     on_message=lambda msg: print(f'--{msg}--'),
-                                     on_error=lambda e: print(e),
-                                     on_close=lambda e: print('on_close: bye'),
-                                     max_retry_times=10000)
+    WebsocketClient.start_with_retry(
+        uri=uri,
+        on_open=lambda: print('connected'),
+        on_message=lambda msg: print(f'--{msg}--'),
+        on_error=lambda e: print(e),
+        on_close=lambda e: print('on_close: bye'),
+        max_retry_times=10000,
+    )
 
     # python core/utils/ws_client.py --query-args 'a=100&b=200'

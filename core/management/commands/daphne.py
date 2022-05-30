@@ -13,27 +13,23 @@ class Command(MetaCommand):
     P = None
 
     def add_arguments(self, parser):
-        parser.add_argument("action", nargs="?", help="specify the action you want to run", type=str)
         parser.add_argument(
-            '--bind', dest='bind', default='0.0.0.0',
+            "action", nargs="?", help="specify the action you want to run", type=str
+        )
+        parser.add_argument(
+            '--bind',
+            dest='bind',
+            default='0.0.0.0',
             help='Listening host',
         )
         parser.add_argument(
-            '--port', dest='port', default='20000',
-            help='Listening port'
+            '--port', dest='port', default='20000', help='Listening port'
         )
+        parser.add_argument('--fd', dest='fd', help='Use a existing socket')
         parser.add_argument(
-            '--fd', dest='fd',
-            help='Use a existing socket'
+            '--endpoint', dest='endpoint', help='Control over the port/socket bindings'
         )
-        parser.add_argument(
-            '--endpoint', dest='endpoint',
-            help='Control over the port/socket bindings'
-        )
-        parser.add_argument(
-            '--app', dest='app',
-            help='The app to run'
-        )
+        parser.add_argument('--app', dest='app', help='The app to run')
 
     @classmethod
     def prepare_configuration_files(cls):
@@ -47,7 +43,9 @@ class Command(MetaCommand):
     def action_start(cls, *args, **options):
         def handle_quit_signal(signum, stack):
             # We must execute this action in a separate process.
-            p = multiprocessing.Process(target=cls.send_signal_to_process, args=(cls.P.pid, signal.SIGINT))
+            p = multiprocessing.Process(
+                target=cls.send_signal_to_process, args=(cls.P.pid, signal.SIGINT)
+            )
             p.start()
             p.join()
 
@@ -58,7 +56,9 @@ class Command(MetaCommand):
 
         daphne_application = options['app']
         if daphne_application is None:
-            raise CommandError('Please specify the app daphne to run. use --app APP_NAME')
+            raise CommandError(
+                'Please specify the app daphne to run. use --app APP_NAME'
+            )
 
         fd = options['fd']
         if fd:

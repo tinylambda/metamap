@@ -14,7 +14,9 @@ class Command(MetaCommand):
     P = None
 
     def add_arguments(self, parser):
-        parser.add_argument("action", nargs="?", help="specify the action you want to run", type=str)
+        parser.add_argument(
+            "action", nargs="?", help="specify the action you want to run", type=str
+        )
 
     @classmethod
     def prepare_configuration_files(cls):
@@ -41,7 +43,9 @@ class Command(MetaCommand):
     def action_start(cls, *args, **options):
         def handle_quit_signal(signum, stack):
             # We must execute this action in a separate process.
-            p = multiprocessing.Process(target=cls.send_signal_to_process, args=(cls.P.pid, signal.SIGINT))
+            p = multiprocessing.Process(
+                target=cls.send_signal_to_process, args=(cls.P.pid, signal.SIGINT)
+            )
             p.start()
             p.join()
 
