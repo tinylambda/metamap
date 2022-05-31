@@ -20,6 +20,7 @@ pytest-django==4.5.2
 pytest-mock==3.7.0
 pytest-sugar==0.9.4
 uhashring==2.1
+uvicorn==0.17.6
 uwsgi==2.0.20
 uwsgitop==0.11
 websockets==10.3

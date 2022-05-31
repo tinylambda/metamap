@@ -12,3 +12,12 @@ class ServerView(View):
 
     def get(self, request):
         return JsonResponse(self.response_dict)
+
+
+async def async_func(request):
+    return JsonResponse(
+        {
+            "func": "async_func",
+            "mode": "async",
+        }
+    )

@@ -13,19 +13,26 @@ import atexit
 import configparser
 import copy
 import os
+import tempfile
 from pathlib import Path
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 from core.utils.config import ConfigWriterWithRepeatKeys
 
+OS_CPU_COUNT = os.cpu_count()
+
+TEMPDIR = tempfile.gettempdir()
+
+
 BASE_DIR = Path(__file__).resolve().parent.parent
-BASE_DIR = (BASE_DIR / '..').resolve()
+BASE_DIR = (BASE_DIR / "..").resolve()
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-h2*(lfkp=u-@8#cmsx_ouq+r*aq#csvlls-a^1#s6bc9)oqtl4'
+SECRET_KEY = "django-insecure-h2*(lfkp=u-@8#cmsx_ouq+r*aq#csvlls-a^1#s6bc9)oqtl4"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -36,53 +43,54 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'channels',
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    'django_prometheus',
-    'django_data',
-    'ninja',
-    'ninja_extra',
-    'account',
-    'core',
-    'access',
-    'server',
+    "channels",
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
+    "django_prometheus",
+    "django_data",
+    "ninja",
+    "ninja_extra",
+    "account",
+    "core",
+    "access",
+    "server",
 ]
 
 MIDDLEWARE = [
-    'django_prometheus.middleware.PrometheusBeforeMiddleware',
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'core.middleware.CoreMiddleware',
-    'django_prometheus.middleware.PrometheusAfterMiddleware',
+    "django_prometheus.middleware.PrometheusBeforeMiddleware",
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "core.middleware.CoreMiddleware",
+    # "core.middleware.simple_middleware",
+    "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 
-MAIN_MODULE_NAME = 'metamap'
+MAIN_MODULE_NAME = "metamap"
 
-ROOT_URLCONF = f'{MAIN_MODULE_NAME}.urls'
+ROOT_URLCONF = f"{MAIN_MODULE_NAME}.urls"
 
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR / 'templates',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            BASE_DIR / "templates",
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -90,24 +98,24 @@ TEMPLATES = [
 
 # https://docs.djangoproject.com/en/4.0/ref/settings/#wsgi-application
 
-WSGI_APPLICATION = f'{MAIN_MODULE_NAME}.wsgi.application'
+WSGI_APPLICATION = f"{MAIN_MODULE_NAME}.wsgi.application"
 
 # https://docs.djangoproject.com/en/4.0/howto/deployment/asgi/
 
-ASGI_APPLICATION = f'{MAIN_MODULE_NAME}.asgi.application'
+ASGI_APPLICATION = f"{MAIN_MODULE_NAME}.asgi.application"
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [
-                'redis://127.0.0.1:6379/0',
-                'redis://127.0.0.1:6379/1',
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [
+                "redis://127.0.0.1:6379/0",
+                "redis://127.0.0.1:6379/1",
             ],
-            'expiry': 60,
-            'group_expiry': 86400,
-            'capacity': 100,
-            'channel_capacity': {},
+            "expiry": 60,
+            "group_expiry": 86400,
+            "capacity": 100,
+            "channel_capacity": {},
         },
     },
 }
@@ -116,9 +124,9 @@ CHANNEL_LAYERS = {
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+    "default": {
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db.sqlite3",
     }
 }
 
@@ -128,16 +136,16 @@ DATABASES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
     },
     {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
 
@@ -145,9 +153,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -157,53 +165,56 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = "static/"
 
 # Where the static files go to when executing python manage.py collectstatic
 # https://docs.djangoproject.com/en/4.0/ref/settings/#std:setting-STATIC_ROOT
 
-STATIC_ROOT = f'/tmp/{MAIN_MODULE_NAME}/static_root/'
+STATIC_ROOT = f"/{TEMPDIR}/{MAIN_MODULE_NAME}/static_root/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Use custom user model
 # https://docs.djangoproject.com/en/4.0/topics/auth/customizing/#substituting-a-custom-user-model
-AUTH_USER_MODEL = 'account.User'
+AUTH_USER_MODEL = "account.User"
 
 # Logging
 # https://docs.djangoproject.com/en/4.0/topics/logging/#logging
 
 LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'standard': {
-            'format': '{levelname} {asctime} {module} {filename} {lineno} {process:d} {thread:d} {message}',
-            'style': '{',
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "standard": {
+            "format": "{levelname} {asctime} {module} {filename} {lineno} {process:d} {thread:d} {message}",
+            "style": "{",
         },
-        'simple': {
-            'format': '{levelname} {message}',
-            'style': '{',
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
         },
     },
-    'handlers': {
-        'console': {
-            'level': 'INFO',
-            'class': 'logging.StreamHandler',
-            'formatter': 'standard',
+    "handlers": {
+        "console": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "standard",
         }
     },
-    'loggers': {
-        'django': {'handlers': ['console'], 'level': 'INFO', 'propagate': False},
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "level": "INFO",
+            "propagate": False,
+        },
     },
 }
 
-OS_CPU_COUNT = os.cpu_count()
 
-WSGI_APPLICATION_REPR = WSGI_APPLICATION.replace('.application', ':application')
+WSGI_APPLICATION_REPR = WSGI_APPLICATION.replace(".application", ":application")
 
 WSGI_SERVICE_PROCESSES = max(OS_CPU_COUNT - 1, 1)
 
@@ -213,7 +224,7 @@ ASGI_SERVICE_PROCESSES = max(OS_CPU_COUNT - 1, 1)
 
 # This is the content of Gunicorn conf file, a valid Python file
 # https://docs.gunicorn.org/en/stable/settings.html#settings
-GUNICORN_CONFIG = f'''
+GUNICORN_CONFIG = f"""
 # The socket to bind. can bind to multiple addresses
 bind = ['127.0.0.1:8000', ]
 
@@ -420,79 +431,79 @@ raw_paste_global_conf = []
 
 # Strip spaces present between the header name and the the :.
 strip_header_spaces = False
-'''
+"""
 GUNICORN_CONFIG_FILENAME = os.path.join(
-    BASE_DIR, 'run', f'gunicorn_{MAIN_MODULE_NAME}.py'
+    BASE_DIR, "run", f"gunicorn_{MAIN_MODULE_NAME}.py"
 )
 
 UWSGI_CONFIG = ConfigWriterWithRepeatKeys()
-UWSGI_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.ini')
+UWSGI_CONF_FILENAME = os.path.join(BASE_DIR, "run", f"uwsgi.{MAIN_MODULE_NAME}.ini")
 
 UWSGI_INSTANCE_CONFIG = {
-    'env': f'DJANGO_SETTINGS_MODULE={MAIN_MODULE_NAME}.settings',
-    'chdir': str(BASE_DIR),
-    'module': f'{WSGI_APPLICATION_REPR}',
-    'master': 'true',
-    'pidfile': os.path.join(BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.pid'),
-    'http': ['127.0.0.1:8000'],
-    'socket': '127.0.0.1:0',
-    'harakiri': '20',
-    'vacuum': 'true',
-    'processes': f'{WSGI_SERVICE_PROCESSES}',
+    "env": f"DJANGO_SETTINGS_MODULE={MAIN_MODULE_NAME}.settings",
+    "chdir": str(BASE_DIR),
+    "module": f"{WSGI_APPLICATION_REPR}",
+    "master": "true",
+    "pidfile": os.path.join(BASE_DIR, "run", f"uwsgi.{MAIN_MODULE_NAME}.pid"),
+    "http": ["127.0.0.1:8000"],
+    "socket": "127.0.0.1:0",
+    "harakiri": "20",
+    "vacuum": "true",
+    "processes": f"{WSGI_SERVICE_PROCESSES}",
     # 'threads': f'{WSGI_SERVICE_THREADS_PER_PROCESS}',
-    'enable-threads': 'false',  # Running uWSGI with the threads options will automatically enable threading support
-    'no-threads-wait': 'true',
-    'max-requests': '5000',
-    'max-requests-delta': '3',
-    'lazy-apps': 'true',
-    'touch-chain-reload': os.path.join(
-        BASE_DIR, 'run', f'uwsgi.{MAIN_MODULE_NAME}.touch'
+    "enable-threads": "false",  # Running uWSGI with the threads options will automatically enable threading support
+    "no-threads-wait": "true",
+    "max-requests": "5000",
+    "max-requests-delta": "3",
+    "lazy-apps": "true",
+    "touch-chain-reload": os.path.join(
+        BASE_DIR, "run", f"uwsgi.{MAIN_MODULE_NAME}.touch"
     ),
-    'disable-logging': 'false',
-    'log-master': 'true',  # delegate logging to master process
-    'stats': '127.0.0.1:9191',
-    'stats-http': 'true',
-    'static-map': [f'/static={STATIC_ROOT}'],
+    "disable-logging": "false",
+    "log-master": "true",  # delegate logging to master process
+    "stats": "127.0.0.1:9191",
+    "stats-http": "true",
+    "static-map": [f"/static={STATIC_ROOT}"],
 }
 
-UWSGI_CONFIG.add_section('uwsgi')
+UWSGI_CONFIG.add_section("uwsgi")
 for setting_key in UWSGI_INSTANCE_CONFIG:
     setting_value = UWSGI_INSTANCE_CONFIG[setting_key]
-    UWSGI_CONFIG.set('uwsgi', setting_key, setting_value)
+    UWSGI_CONFIG.set("uwsgi", setting_key, setting_value)
 
 
 CIRCUSD_CONFIG = configparser.ConfigParser(interpolation=None)
-CIRCUSD_CONF_FILENAME = os.path.join(BASE_DIR, 'run', f'circusd.{MAIN_MODULE_NAME}.ini')
-CIRCUSD_PID_FILENAME = os.path.join(BASE_DIR, 'run', f'circusd.{MAIN_MODULE_NAME}.pid')
-CIRCUSD_LOG_ROOT_DIR = f'/tmp/log/{MAIN_MODULE_NAME}/circus'
+CIRCUSD_CONF_FILENAME = os.path.join(BASE_DIR, "run", f"circusd.{MAIN_MODULE_NAME}.ini")
+CIRCUSD_PID_FILENAME = os.path.join(BASE_DIR, "run", f"circusd.{MAIN_MODULE_NAME}.pid")
+CIRCUSD_LOG_ROOT_DIR = f"/tmp/log/{MAIN_MODULE_NAME}/circus"
 
 CIRCUSD_STATIC_CONFIG_LIST = [
     {
-        'name': 'circus',
-        'settings': {
-            'endpoint': 'tcp://127.0.0.1:5555',
-            'endpoint_owner': 'None',
-            'pubsub_endpoint': 'tcp://127.0.0.1:5556',
-            'statsd': 'False',
-            'stats_endpoint': 'tcp://127.0.0.1:5557',
-            'stats_close_outputs': 'False',
-            'check_delay': '5',
-            'stream_backend': 'thread',
-            'warmup_delay': '0',
-            'debug': 'False',
-            'debug_gc': 'False',
-            'pidfile': os.path.join(BASE_DIR, 'run', f'circusd.{MAIN_MODULE_NAME}.pid'),
-            'umask': '002',
-            'loglevel': 'INFO',
-            'logoutput': '-',
-            'loggerconfig': '',
+        "name": "circus",
+        "settings": {
+            "endpoint": "tcp://127.0.0.1:5555",
+            "endpoint_owner": "None",
+            "pubsub_endpoint": "tcp://127.0.0.1:5556",
+            "statsd": "False",
+            "stats_endpoint": "tcp://127.0.0.1:5557",
+            "stats_close_outputs": "False",
+            "check_delay": "5",
+            "stream_backend": "thread",
+            "warmup_delay": "0",
+            "debug": "False",
+            "debug_gc": "False",
+            "pidfile": os.path.join(BASE_DIR, "run", f"circusd.{MAIN_MODULE_NAME}.pid"),
+            "umask": "002",
+            "loglevel": "INFO",
+            "logoutput": "-",
+            "loggerconfig": "",
         },
     },
 ]
 
 for CIRCUSD_STATIC_CONFIG in CIRCUSD_STATIC_CONFIG_LIST:
-    section_name = CIRCUSD_STATIC_CONFIG['name']
-    settings = CIRCUSD_STATIC_CONFIG['settings']
+    section_name = CIRCUSD_STATIC_CONFIG["name"]
+    settings = CIRCUSD_STATIC_CONFIG["settings"]
 
     CIRCUSD_CONFIG.add_section(section_name)
     for setting_key in settings:
@@ -501,97 +512,97 @@ for CIRCUSD_STATIC_CONFIG in CIRCUSD_STATIC_CONFIG_LIST:
 
 
 CIRCUS_WATCHER_DEFAULT_SETTINGS = {
-    'cmd': '/bin/cat',
-    'args': '',
-    'shell': 'False',
-    'shell_args': 'None',
-    'working_dir': str(BASE_DIR),
+    "cmd": "/bin/cat",
+    "args": "",
+    "shell": "False",
+    "shell_args": "None",
+    "working_dir": str(BASE_DIR),
     # 'uid': '',  # current uid is the default
     # 'gid': '',  # current gid is the default
-    'copy_env': 'True',  # If true, the local env vars will be copied and passed to the workers when spawning them.
-    'copy_path': 'False',  # If true, sys.path is passed to the subprocess env using PYTHONPATH. copy_env has to be True
-    'warmup_delay': '1',
-    'autostart': 'False',
-    'numprocesses': '1',
-    'stderr_stream.class': 'FileStream',
-    'stderr_stream.filename': os.path.join(
-        CIRCUSD_LOG_ROOT_DIR, '{watcher_name:s}.error.log'
+    "copy_env": "True",  # If true, the local env vars will be copied and passed to the workers when spawning them.
+    "copy_path": "False",  # If true, sys.path is passed to the subprocess env using PYTHONPATH. copy_env has to be True
+    "warmup_delay": "1",
+    "autostart": "False",
+    "numprocesses": "1",
+    "stderr_stream.class": "FileStream",
+    "stderr_stream.filename": os.path.join(
+        CIRCUSD_LOG_ROOT_DIR, "{watcher_name:s}.error.log"
     ),
-    'stderr_stream.time_format': '%Y-%m-%d %H:%M:%S',
-    'stderr_stream.max_bytes': '1073741824',
-    'stderr_stream.backup_count': '5',
-    'stdout_stream.class': 'FileStream',
-    'stdout_stream.filename': os.path.join(
-        CIRCUSD_LOG_ROOT_DIR, '{watcher_name:s}.info.log'
+    "stderr_stream.time_format": "%Y-%m-%d %H:%M:%S",
+    "stderr_stream.max_bytes": "1073741824",
+    "stderr_stream.backup_count": "5",
+    "stdout_stream.class": "FileStream",
+    "stdout_stream.filename": os.path.join(
+        CIRCUSD_LOG_ROOT_DIR, "{watcher_name:s}.info.log"
     ),
-    'stdout_stream.time_format': '%Y-%m-%d %H:%M:%S',
-    'stdout_stream.max_bytes': '1073741824',
-    'stdout_stream.backup_count': '5',
-    'close_child_stdin': 'True',
-    'close_child_stdout': 'False',
-    'close_child_stderr': 'False',
-    'send_hup': 'False',
-    'stop_signal': 'INT',
-    'stop_children': 'False',
-    'max_retry': '2',
-    'graceful_timeout': '30',
-    'priority': '10',
-    'singleton': 'True',
-    'use_sockets': 'False',
+    "stdout_stream.time_format": "%Y-%m-%d %H:%M:%S",
+    "stdout_stream.max_bytes": "1073741824",
+    "stdout_stream.backup_count": "5",
+    "close_child_stdin": "True",
+    "close_child_stdout": "False",
+    "close_child_stderr": "False",
+    "send_hup": "False",
+    "stop_signal": "INT",
+    "stop_children": "False",
+    "max_retry": "2",
+    "graceful_timeout": "30",
+    "priority": "10",
+    "singleton": "True",
+    "use_sockets": "False",
     # 'max_age': '100000',  # Default disabled
     # 'max_age_variance': ,  # Variate above
-    'virtualenv': os.path.join(
-        BASE_DIR, 'venv'
+    "virtualenv": os.path.join(
+        BASE_DIR, "venv"
     ),  # root of a virtualenv directory. need copy_env to be True
     # 'virtualenv_py_ver': '',  # specify python version, must be used with virtualenv
-    'respawn': 'True',  # If set to False, the processes handled by a watcher will not be respawned automatically.
+    "respawn": "True",  # If set to False, the processes handled by a watcher will not be respawned automatically.
     # 'use_papa': 'False',
 }
 
 CIRCUS_SOCKETS = [
     {
-        'name': f'{MAIN_MODULE_NAME}_ASGI',
-        'settings': {
-            'host': '127.0.0.1',
-            'port': '20000',
+        "name": f"{MAIN_MODULE_NAME}_ASGI",
+        "settings": {
+            "host": "127.0.0.1",
+            "port": "20000",
         },
     }
 ]
 
 CIRCUS_ENVS = [
-    {'name': f'{MAIN_MODULE_NAME}_HTTP', 'settings': {}},
-    {'name': f'{MAIN_MODULE_NAME}_ASGI', 'settings': {}},
+    {"name": f"{MAIN_MODULE_NAME}_HTTP", "settings": {}},
+    {"name": f"{MAIN_MODULE_NAME}_ASGI", "settings": {}},
 ]
 
 CIRCUS_WATCHERS = [
     {
-        'name': f'gunicorn',
-        'settings': {
-            'cmd': 'python manage.py gunicorn start',
-            'stop_signal': 'INT',
-            'singleton': 'True',
-            'autostart': 'True',
-            'use_sockets': 'False',
+        "name": f"gunicorn",
+        "settings": {
+            "cmd": "python manage.py gunicorn start",
+            "stop_signal": "INT",
+            "singleton": "True",
+            "autostart": "True",
+            "use_sockets": "False",
         },
     },
     {
-        'name': f'daphne',
-        'settings': {
-            'cmd': f'python manage.py daphne start --fd $(circus.sockets.{MAIN_MODULE_NAME}_ASGI) '
-            f'--app {MAIN_MODULE_NAME}.asgi:application',
-            'use_sockets': 'True',
-            'singleton': 'False',
-            'autostart': 'True',
-            'numprocesses': f'{ASGI_SERVICE_PROCESSES}',
-            'priority': '1',
+        "name": f"daphne",
+        "settings": {
+            "cmd": f"python manage.py daphne start --fd $(circus.sockets.{MAIN_MODULE_NAME}_ASGI) "
+            f"--app {MAIN_MODULE_NAME}.asgi:application",
+            "use_sockets": "True",
+            "singleton": "False",
+            "autostart": "True",
+            "numprocesses": f"{ASGI_SERVICE_PROCESSES}",
+            "priority": "1",
         },
     },
 ]
 
 for CIRCUS_SOCKET in CIRCUS_SOCKETS:
-    name = CIRCUS_SOCKET['name']
-    settings = CIRCUS_SOCKET['settings']
-    section_name = f'socket:{name}'
+    name = CIRCUS_SOCKET["name"]
+    settings = CIRCUS_SOCKET["settings"]
+    section_name = f"socket:{name}"
 
     CIRCUSD_CONFIG.add_section(section_name)
     for setting_key in settings:
@@ -599,16 +610,16 @@ for CIRCUS_SOCKET in CIRCUS_SOCKETS:
         CIRCUSD_CONFIG.set(section_name, setting_key, setting_value)
 
 for CIRCUS_ENV in CIRCUS_ENVS:
-    name = CIRCUS_ENV['name']
-    settings = CIRCUS_ENV['settings']
-    section_name = f'env:{name}'
+    name = CIRCUS_ENV["name"]
+    settings = CIRCUS_ENV["settings"]
+    section_name = f"env:{name}"
     for setting_key in settings:
         setting_value = settings[setting_key]
         CIRCUSD_CONFIG.set(section_name, setting_key, setting_value)
 
 for CIRCUS_WATCHER in CIRCUS_WATCHERS:
-    name = CIRCUS_WATCHER['name']
-    watcher_settings = CIRCUS_WATCHER['settings']
+    name = CIRCUS_WATCHER["name"]
+    watcher_settings = CIRCUS_WATCHER["settings"]
     settings = copy.copy(CIRCUS_WATCHER_DEFAULT_SETTINGS)
     settings.update(watcher_settings)
     section_name = f"watcher:{name}"
@@ -622,15 +633,15 @@ for CIRCUS_WATCHER in CIRCUS_WATCHERS:
 
 
 ETCD_KWARGS = {
-    'host': 'localhost',
-    'port': 2379,
+    "host": "localhost",
+    "port": 2379,
 }
 
 # Where to register all types of services
-SERVICE_ROOT = f'/{MAIN_MODULE_NAME}/services/'
+SERVICE_ROOT = f"/{MAIN_MODULE_NAME}/services/"
 
 # Distributed locks used in this project
-SERVICE_LOCK_ROOT = f'/{MAIN_MODULE_NAME}/locks/'
+SERVICE_LOCK_ROOT = f"/{MAIN_MODULE_NAME}/locks/"
 
 # How many seconds a service's lease
 SERVICE_LEASE_DEFAULT_SECONDS = 20
@@ -641,19 +652,19 @@ SERVICE_LEASE_REFRESH_WHEN_SMALLER_THAN = 5
 # Used for generating nginx configuration files for http and websocket service
 # Use python manage.py nginx create to generate the configuration files and copy them to your nginx conf.d directory
 NGINX_HTTP_CONF_FILENAME = os.path.join(
-    BASE_DIR, 'run', f'nginx-http-{MAIN_MODULE_NAME}.conf'
+    BASE_DIR, "run", f"nginx-http-{MAIN_MODULE_NAME}.conf"
 )
 
 NGINX_WEBSOCKET_CONF_FILENAME = os.path.join(
-    BASE_DIR, 'run', f'nginx-websocket-{MAIN_MODULE_NAME}.conf'
+    BASE_DIR, "run", f"nginx-websocket-{MAIN_MODULE_NAME}.conf"
 )
 
-NGINX_HTTP_SERVER_NAME = 'game-http.domain.com'
+NGINX_HTTP_SERVER_NAME = "game-http.domain.com"
 
-NGINX_WEBSOCKET_SERVER_NAME = 'game-ws.domain.com'
+NGINX_WEBSOCKET_SERVER_NAME = "game-ws.domain.com"
 
 
-PROMETHEUS_METRIC_NAMESPACE = 'metamap'
+PROMETHEUS_METRIC_NAMESPACE = "metamap"
 
 PROMETHEUS_LATENCY_BUCKETS = (
     0.01,

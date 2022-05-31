@@ -18,17 +18,18 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from server.views import ServerView
+from server.views import ServerView, async_func
 
 from .api import api, api_extra
 
 
 urlpatterns = [
-    path('api/', api.urls),
-    path('api-extra/', api_extra.urls),
-    path('servers/', ServerView.as_view()),
-    path('admin/', admin.site.urls),
-    path('', include('django_prometheus.urls')),
+    path("api/", api.urls),
+    path("api-extra/", api_extra.urls),
+    path("servers/", ServerView.as_view()),
+    path("admin/", admin.site.urls),
+    path("async_func/", async_func),
+    path("", include("django_prometheus.urls")),
 ]
 
 # For debug purpose only

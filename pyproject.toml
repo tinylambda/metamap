@@ -1,6 +1,6 @@
 [tool.black]
 line-length = 88
-skip-string-normalization = true
+skip-string-normalization = false
 skip-magic-trailing-comma = false
 
 [tool.pytest.ini_options]

@@ -6,38 +6,45 @@ from pydantic import Field
 
 from server.models import Server
 
-api = NinjaAPI(version='2.0.0')
+api = NinjaAPI(version="2.0.0")
 api_extra = NinjaExtraAPI()
 
 
-@api.get('/hello')
+@api.get("/hello")
 def hello(request):
-    return 'Hello world'
+    return "Hello world"
 
 
-@api_extra.get('/add', tags=['Math', 'important'])
+@api.get("/hello_async")
+async def hello_async(request):
+    return {
+        "mode": "async",
+    }
+
+
+@api_extra.get("/add", tags=["Math", "important"])
 def add(request, a: int, b: int):
-    return {'result': a + b}
+    return {"result": a + b}
 
 
-@api_extra.get('/add_float', tags=['Math', 'important'])
+@api_extra.get("/add_float", tags=["Math", "important"])
 def add_float(request, a: float, b: float):
-    return {'result': a + b}
+    return {"result": a + b}
 
 
-@api_controller('/', tags=['Math'], permissions=[])
+@api_controller("/", tags=["Math"], permissions=[])
 class MathAPI:
-    @http_get('/substract')
+    @http_get("/substract")
     def substract(self, a: int, b: int):
-        return {'result': a - b}
+        return {"result": a - b}
 
-    @http_get('/divide')
+    @http_get("/divide")
     def divide(self, a: int, b: int):
-        return {'result': a / b}
+        return {"result": a / b}
 
-    @http_get('/multiple')
+    @http_get("/multiple")
     def multiple(self, a: int, b: int):
-        return {'result': a * b}
+        return {"result": a * b}
 
 
 class CreateServerArgs(Schema):
@@ -51,17 +58,17 @@ class SearchServerArgs(Schema):
 
 
 class SearchServerSortArgs(Schema):
-    field: str = Field(default='id')
-    order: str = Field(default='ASC')
+    field: str = Field(default="id")
+    order: str = Field(default="ASC")
 
 
 class ServerItem(Schema):
     name: str = Field(...)
 
 
-@api_controller('/server', tags=['Server'])
+@api_controller("/server", tags=["Server"])
 class ServerAPI:
-    @http_post('/create_server', response=CreateServerArgs)
+    @http_post("/create_server", response=CreateServerArgs)
     def create_server(
         self,
         request,
@@ -69,7 +76,7 @@ class ServerAPI:
     ):
         return create_server_args
 
-    @http_get('/search_server', response=List[ServerItem])
+    @http_get("/search_server", response=List[ServerItem])
     def search_server(
         self,
         request,
@@ -77,7 +84,7 @@ class ServerAPI:
         sort_args: SearchServerSortArgs = Query(None),
     ):
         servers = [
-            Server(name=f's{item}', ip=f'192.168.0.{item}') for item in range(10)
+            Server(name=f"s{item}", ip=f"192.168.0.{item}") for item in range(10)
         ]
         return servers
 
