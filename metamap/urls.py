@@ -18,7 +18,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
 
-from server.views import ServerView, async_func
+from server.views import ServerView, async_func, sync_func
 
 from .api import api, api_extra
 
@@ -29,6 +29,7 @@ urlpatterns = [
     path("servers/", ServerView.as_view()),
     path("admin/", admin.site.urls),
     path("async_func/", async_func),
+    path("sync_func/", sync_func),
     path("", include("django_prometheus.urls")),
 ]
 

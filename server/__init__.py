@@ -5,7 +5,7 @@ When it comes to server implementation, we can divide it into two parts:
 1. I/O, Network, local disk ...
 2. Logic, how to reply to a request.
 
-Server becomes meaningful only if it can have some side effects:
+Server becomes meaningful only if it can trigger some side effects:
 game user get level up, create an account in a system, post a blog on a site ...
 all of which will use I/O.
 
@@ -16,7 +16,7 @@ When there is only one synchronous execution model, that's OK, but when we want 
 an asynchronous execution model, we must reimplement the logic in an asynchronous way, which the main difference is
 brought by the I/O difference between synchronous I/O and asynchronous I/O.
 
-So, if we could implement our logic that can run both in synchronous and asynchronous I/O, it will be greate,
+So, if we could implement our logic that can run both in synchronous and asynchronous I/O, it will be great,
 it requires some type of I/O-driven execution framework that can wipe out the difference between different I/O model.
 
 In the Python programming language, there is a concept called generator, which can be treated as an execution routine,

@@ -60,6 +60,8 @@ INSTALLED_APPS = [
     "server",
 ]
 
+from django.middleware.security import SecurityMiddleware
+
 MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
     "django.middleware.security.SecurityMiddleware",
@@ -70,7 +72,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.CoreMiddleware",
-    # "core.middleware.simple_middleware",
+    "core.middleware.simple_middleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 

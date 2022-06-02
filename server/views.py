@@ -21,3 +21,12 @@ async def async_func(request):
             "mode": "async",
         }
     )
+
+
+def sync_func(request):
+    return JsonResponse(
+        {
+            "func": "sync_func",
+            "mode": "sync",
+        }
+    )

@@ -1,3 +1,5 @@
+ALLOWED_HOSTS = ["*"]
+
 # https://docs.djangoproject.com/en/4.0/topics/logging/#logging
 
 LOGGING = {
@@ -15,7 +17,7 @@ LOGGING = {
     },
     "handlers": {
         "console": {
-            "level": "INFO",
+            "level": "DEBUG",
             "class": "logging.StreamHandler",
             "formatter": "standard",
         }
@@ -25,6 +27,10 @@ LOGGING = {
             "handlers": ["console"],
             "level": "INFO",
             "propagate": False,
+        },
+        "django.request": {
+            "handlers": ["console"],
+            "level": "DEBUG",
         },
         "root": {
             "handlers": ["console"],
