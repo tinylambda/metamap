@@ -4,12 +4,55 @@ import logging
 import threading
 
 from channels.http import AsgiRequest
+from django.http import JsonResponse
 from django.utils.decorators import sync_and_async_middleware
 from django.utils.deprecation import MiddlewareMixin
 
 
+class PureMiddleware:
+    sync_capable = True
+    async_capable = True
+
+    def __init__(self, get_response):
+        self.get_response = get_response
+        # This is necessary
+        if asyncio.iscoroutinefunction(self.get_response):
+            # Mark the class as async-capable, but do the actual switch
+            # inside __call__ to avoid swapping out dunder methods
+            self._is_coroutine = asyncio.coroutines._is_coroutine
+
+    async def process_view(self, request, view_func, view_args, view_kwargs):
+        logging.info(
+            "PureMiddleware process_view in %s, %s",
+            self,
+            asyncio.iscoroutinefunction(view_func),
+        )
+
+    def __call__(self, request):
+        if asyncio.iscoroutinefunction(self.get_response):
+            return self.__acall__(request)
+
+        logging.info(
+            "PureMiddleware before get_response, %s", threading.current_thread().name
+        )
+        response = self.get_response(request)
+        logging.info(
+            "PureMiddleware after get_response, %s", threading.current_thread().name
+        )
+        return response
+
+    async def __acall__(self, request):
+        logging.info("PureMiddleware async before get_response")
+        response = await self.get_response(request)
+        logging.info("PureMiddleware async after get_response")
+        return response
+
+
 class CoreMiddleware(MiddlewareMixin):
     """old style middleware"""
+
+    def __init__(self, get_response):
+        super(CoreMiddleware, self).__init__(get_response)
 
     # It should return either None or an HttpResponse object.
     # If it returns None, Django will continue processing this request,

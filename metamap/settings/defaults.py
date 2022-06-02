@@ -72,6 +72,7 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "core.middleware.CoreMiddleware",
+    "core.middleware.PureMiddleware",
     "core.middleware.simple_middleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
