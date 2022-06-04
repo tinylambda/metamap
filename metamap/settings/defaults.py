@@ -51,7 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "django_prometheus",
-    "django_data",
+    "django_data_sdk",
     "ninja",
     "ninja_extra",
     "account",
@@ -60,10 +60,10 @@ INSTALLED_APPS = [
     "server",
 ]
 
-from django.middleware.security import SecurityMiddleware
 
 MIDDLEWARE = [
     "django_prometheus.middleware.PrometheusBeforeMiddleware",
+    "django_data_sdk.middleware.DjangoDataTopMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -71,9 +71,10 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "core.middleware.CoreMiddleware",
-    "core.middleware.PureMiddleware",
-    "core.middleware.simple_middleware",
+    # "core.middleware.CoreMiddleware",
+    # "core.middleware.PureMiddleware",
+    # "core.middleware.simple_middleware",
+    "django_data_sdk.middleware.DjangoDataBottomMiddleware",
     "django_prometheus.middleware.PrometheusAfterMiddleware",
 ]
 

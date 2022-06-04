@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from ninja import NinjaAPI, Schema, Query
+from ninja import NinjaAPI, Schema, Query, Body
 from ninja_extra import NinjaExtraAPI, api_controller, http_get, http_post
 from pydantic import Field
 
@@ -20,6 +20,16 @@ async def hello_async(request):
     return {
         "mode": "async",
     }
+
+
+class BodyArg(Schema):
+    name: str = Field(...)
+    content: str = Field()
+
+
+@api.post("/hello_body")
+async def hello_body(request, body_arg: BodyArg = Body(...)):
+    return body_arg
 
 
 @api_extra.get("/add", tags=["Math", "important"])
