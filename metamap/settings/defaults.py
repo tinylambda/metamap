@@ -59,6 +59,7 @@ INSTALLED_APPS = [
     "access",
     "server",
     "tao",
+    "datasource",
 ]
 
 
